@@ -1,0 +1,2 @@
+X DWORD 2
+Y DWORD 7

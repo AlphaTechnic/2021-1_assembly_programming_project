@@ -1,4 +1,12 @@
 TITLE Summing the gaps between Array Values
+;Write a program with a loop and indexed addressing that calculates the sum of all the gaps
+;between successive array elements. The array elements are doublewords, sequenced in nondecreasing
+;order.
+;
+;input :
+;hw1.inc
+;
+
 
 INCLUDE irvine32.inc
 .data
@@ -13,9 +21,9 @@ main PROC
 SUMLOOP:
 	mov edx, [esi]
 	mov ebx, [esi+TYPE esi]
-	sub ebx, edx
-	add eax, ebx
-	add esi, TYPE array1
+	sub ebx, edx				; ebx gets the difference between two adjacent terms
+	add eax, ebx				; store result in eax
+	add esi, TYPE array1		; tune esi
 	loop SUMLOOP
 	call DumpRegs
 main ENDP
