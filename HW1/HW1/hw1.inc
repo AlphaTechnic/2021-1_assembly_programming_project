@@ -1,1 +1,1 @@
-array1 DWORD 0, 5, 6, 9
+array1 DWORD 4, 5

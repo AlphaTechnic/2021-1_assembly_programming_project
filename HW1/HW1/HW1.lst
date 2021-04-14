@@ -1,17 +1,15 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/15/21 00:36:45
-Exponential Powe					     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/15/21 01:23:09
+%Summing the gaps between Array Value			     Page 1 - 1
 
 
-				TITLE Exponential Power
-				;Make a program to calculate the
-				;value of "X to the power of Y" and "Y to the power of X".
-				;Store each result into EAX and EBX respectively and
-				;then print contents of the registers using DumpRegs;
+				TITLE Summing the gaps between Array Values
+				;Write a program with a loop and indexed addressing that calculates the sum of all the gaps
+				;between successive array elements. The array elements are doublewords, sequenced in nondecreasing
+				;order.
 				;
 				;input :
-				;hw_3.inc
+				;hw1.inc
 				;
-
 
 
 				INCLUDE irvine32.inc
@@ -32,64 +30,30 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/15/21 00:36:45
 			      C .NOLIST
 			      C .LIST
 			      C 
-
  00000000			.data
-				INCLUDE hw3.inc
- 00000000 00000002	      C X DWORD 2
- 00000004 00000007	      C Y DWORD 7
+				INCLUDE hw1.inc
+ 00000000 00000004	      C array1 DWORD 4, 5
+	   00000005
 			      C 
- 00000008 00000000		outer_loop_count DWORD ?
- 0000000C 00000000		x_power_y DWORD ?
- 00000010 00000000		y_power_x DWORD ?
 
  00000000			.code
  00000000			main PROC
-				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; get x_power_y
- 00000000  BA 00000000			mov edx, 0
- 00000005  C7 05 0000000C R		mov x_power_y, 1
-	   00000001
- 0000000F  8B 0D 00000004 R		mov ecx, Y
-
- 00000015			outer_loop:
- 00000015  89 0D 00000008 R		mov outer_loop_count, ecx
- 0000001B  8B 0D 00000000 R		mov ecx, X
-
- 00000021			inner_loop:
- 00000021  03 15 0000000C R		add edx, x_power_y
- 00000027  E2 F8			loop inner_loop
-
- 00000029  89 15 0000000C R		mov x_power_y, edx			 ; record the power of x
- 0000002F  BA 00000000			mov edx, 0
- 00000034  8B 0D 00000008 R		mov ecx, outer_loop_count
- 0000003A  E2 D9			loop outer_loop
-
-				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; get y_power_x
- 0000003C  BA 00000000			mov edx, 0
- 00000041  C7 05 00000010 R		mov y_power_x, 1
-	   00000001
- 0000004B  8B 0D 00000000 R		mov ecx, X
-
- 00000051			outer_loop2:
- 00000051  89 0D 00000008 R		mov outer_loop_count, ecx
- 00000057  8B 0D 00000004 R		mov ecx, Y
-
- 0000005D			inner_loop2:
- 0000005D  03 15 00000010 R		add edx, y_power_x
- 00000063  E2 F8			loop inner_loop2
-
- 00000065  89 15 00000010 R		mov y_power_x, edx
- 0000006B  BA 00000000			mov edx, 0
- 00000070  8B 0D 00000008 R		mov ecx, outer_loop_count	 ; record the power of y
- 00000076  E2 D9			loop outer_loop2
-
- 00000078  A1 0000000C R		mov eax, x_power_y
- 0000007D  8B 1D 00000010 R		mov ebx, y_power_x
-
- 00000083  E8 00000000 E		call DumpRegs
- 00000088			main ENDP
+ 00000000  B9 00000002			mov ecx, LENGTHOF array1
+ 00000005  49				dec ecx
+ 00000006  BE 00000000 R		mov esi, OFFSET array1
+ 0000000B  B8 00000000			mov eax, 0
+ 00000010			SUMLOOP:
+ 00000010  8B 16			mov edx, [esi]
+ 00000012  8B 5E 04			mov ebx, [esi+TYPE esi]
+ 00000015  2B DA			sub ebx, edx				; ebx gets the difference between two adjacent terms
+ 00000017  03 C3			add eax, ebx				; store result in eax
+ 00000019  83 C6 04			add esi, TYPE array1		; tune esi
+ 0000001C  E2 F2			loop SUMLOOP
+ 0000001E  E8 00000000 E		call DumpRegs
+ 00000023			main ENDP
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/15/21 00:36:45
-Exponential Powe					     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/15/21 01:23:09
+%Summing the gaps between Array Value			     Symbols 2 - 1
 
 
 
@@ -182,8 +146,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000014 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000088 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000008 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000023 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -290,11 +254,8 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000088 Public STDCALL
-  outer_loop . . . . . . . . . .	L Near	 00000015 _TEXT	
-  inner_loop . . . . . . . . . .	L Near	 00000021 _TEXT	
-  outer_loop2  . . . . . . . . .	L Near	 00000051 _TEXT	
-  inner_loop2  . . . . . . . . .	L Near	 0000005D _TEXT	
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000023 Public STDCALL
+  SUMLOOP  . . . . . . . . . . .	L Near	 00000010 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -513,8 +474,7 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-X  . . . . . . . . . . . . . . .	DWord	 00000000 _DATA	
-Y  . . . . . . . . . . . . . . .	DWord	 00000004 _DATA	
+array1 . . . . . . . . . . . . .	DWord	 00000000 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
@@ -529,12 +489,9 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-outer_loop_count . . . . . . . .	DWord	 00000008 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
-x_power_y  . . . . . . . . . . .	DWord	 0000000C _DATA	
-y_power_x  . . . . . . . . . . .	DWord	 00000010 _DATA	
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
 
 	   0 Warnings

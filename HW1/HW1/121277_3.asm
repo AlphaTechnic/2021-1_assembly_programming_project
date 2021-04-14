@@ -56,8 +56,8 @@ inner_loop2:
 	mov ecx, outer_loop_count	 ; record the power of y
 	loop outer_loop2
 
-	mov eax, x_power_y
-	mov ebx, y_power_x
+	mov eax, x_power_y			 ; move result mem to eax
+	mov ebx, y_power_x			 ; move result mem to ebx
 
 	call DumpRegs
 main ENDP
