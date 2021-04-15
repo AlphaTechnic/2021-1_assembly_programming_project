@@ -21,9 +21,9 @@ main PROC
 SUMLOOP:
 	mov edx, [esi]
 	mov ebx, [esi+TYPE esi]
-	sub ebx, edx				; ebx gets the difference between two adjacent terms
-	add eax, ebx				; store result in eax
-	add esi, TYPE array1		; tune esi
+	sub ebx, edx	; ebx gets the difference between two adjacent terms
+	add eax, ebx	; store result in eax
+	add esi, TYPE array1	; tune esi
 	loop SUMLOOP
 	call DumpRegs
 main ENDP

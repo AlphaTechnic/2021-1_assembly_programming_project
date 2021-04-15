@@ -27,6 +27,6 @@ L :
 	call DumpRegs
 
 	mov edx, OFFSET target
-	call WriteString
+	call WriteString	;povided by the Irvine library
 main ENDP
 END main
