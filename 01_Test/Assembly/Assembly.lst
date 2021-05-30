@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    03/29/21 13:49:11
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/21/21 06:15:22
 "TEST code : My first Assembly Cod			     Page 1 - 1
 
 
@@ -23,16 +23,25 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    03/29/21 13:49:11
 			      C .LIST
 			      C 
 
+ 00000000			.data
+ 00000000 12 34 56 78			bigEndian byte 12h, 34h, 56h, 78h
+ 00000004 00000000			littleEndian dword ?
  00000000			.code
  00000000			main PROC
- 00000000  B8 00020000			mov eax, 20000h
- 00000005  BB 00010000			mov ebx, 10000h
- 0000000A  05 00005000			add eax, 5000h
- 0000000F  2B C3			sub eax, ebx
- 00000011  E8 00000000 E		call DumpRegs
- 00000016			main ENDP
+ 00000000  FF 35 00000000 R		push dword ptr bigEndian
+ 00000006  FF 35 00000001 R		push dword ptr bigEndian + 1
+ 0000000C  FF 35 00000002 R		push dword ptr bigEndian + 2
+ 00000012  FF 35 00000003 R		push dword ptr bigEndian + 3
+ 00000018  8F 05 00000007 R		pop littleEndian +3
+ 0000001E  8F 05 00000006 R		pop littleEndian +2
+ 00000024  8F 05 00000005 R		pop littleEndian +1
+ 0000002A  8F 05 00000004 R		pop littleEndian
+ 00000030  A1 00000004 R		mov eax, littleEndian
+
+ 00000035  E8 00000000 E		call dumpregs
+ 0000003A			main ENDP
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    03/29/21 13:49:11
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/21/21 06:15:22
 "TEST code : My first Assembly Cod			     Symbols 2 - 1
 
 
@@ -126,8 +135,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000016 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000008 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000003A Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -234,7 +243,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000016 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000003A Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -453,6 +462,7 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
+bigEndian  . . . . . . . . . . .	Byte	 00000000 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
@@ -466,6 +476,7 @@ lightGray  . . . . . . . . . . .	Number	 00000007h
 lightGreen . . . . . . . . . . .	Number	 0000000Ah   
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
+littleEndian . . . . . . . . . .	DWord	 00000004 _DATA	
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 white  . . . . . . . . . . . . .	Number	 0000000Fh   

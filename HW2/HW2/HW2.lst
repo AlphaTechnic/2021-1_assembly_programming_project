@@ -1,10 +1,10 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/20/21 05:21:12
-Tes							     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    05/30/21 12:25:03
+: septenary to decima					     Page 1 - 1
 
 
-				TITLE Test
+				TITLE : septenary to decimal
 
-				INCLUDE irvine32.inc
+				include Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
 			      C ;OPTION CASEMAP:NONE		; optional: make identifiers case-sensitive
@@ -24,17 +24,67 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/20/21 05:21:12
 			      C 
 
  00000000			.data
- 00000000 00 10 20		arrayB BYTE 00h, 10h, 20h
+ 00000000 33 34 31 32 33	var1 byte "34123456", 0
+	   34 35 36 00
 
  00000000			.code
- 00000000			main PROC
- 00000000  66| A1			mov ax, word ptr arrayB
-	   00000000 R
- 00000006  E8 00000000 E		call DumpRegs
- 0000000B			main ENDP
+ 00000000			main proc
+ 00000000  BE 00000000 R		mov esi, offset var1
+ 00000005  0F B6 1E			movzx ebx, byte ptr [esi]	;esi가 var1의 head부터 tail까지를 하나씩 가리키도록
+ 00000008  83 EB 30			sub ebx, 30h				;char to int number (ascii of '0' is 30h)
+ 0000000B  BA 00000000			mov edx, 0					;edx에 계산 결과를 누적한다
+
+ 00000010  B9 00000009			mov ecx, lengthof var1		;ecx for loop counter
+ 00000015  83 E9 02			sub ecx, 2
+
+ 00000018			L1:
+ 00000018  52				push edx					;현재까지의 계산 결과를 push
+ 00000019  E8 0000001B			call accumul_pow7
+
+ 0000001E  5B				pop ebx						
+ 0000001F  03 D3			add edx, ebx				;현재까지의 계산 결과에 새롭게 계산된 결과를 누적
+
+ 00000021  83 C6 01			add esi, type var1			;esi가 next digit을 가리키도록 함
+ 00000024  0F B6 1E			movzx ebx, byte ptr [esi]
+ 00000027  83 EB 30			sub ebx, 30h				;char to int number (ascii of '0' is 30h)
+
+ 0000002A  83 E9 01			sub ecx, 1					;loop counter handling
+ 0000002D  83 F9 FF			cmp ecx, -1
+ 00000030  75 E6			jnz L1
+
+ 00000032  8B C2			mov eax, edx				;edx에 기록된 최종 계산결과를 eax에 저장
+ 00000034  E8 00000000 E		call dumpregs
+ 00000039			main ENDP
+
+
+				;---------------------------------------------------------
+ 00000039			accumul_pow7 PROC
+ 00000039  51				push ecx
+					
+ 0000003A  B8 00000001			mov eax, 1
+ 0000003F  BA 00000007			mov edx, 7
+
+ 00000044			L1:
+
+ 00000044  83 F9 00			cmp ecx, 0
+ 00000047  74 09			jz L2
+
+ 00000049  BA 00000007			mov edx, 7
+ 0000004E  F7 E2			mul edx
+ 00000050  E2 F2			loop L1
+
+ 00000052			L2:
+ 00000052  F7 E3			mul ebx
+ 00000054  03 D0			add edx, eax
+
+ 00000056  59				pop ecx
+ 00000057  C3				ret
+ 00000058			accumul_pow7 ENDP
+				;---------------------------------------------------------
+
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/20/21 05:21:12
-Tes							     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    05/30/21 12:25:03
+: septenary to decima					     Symbols 2 - 1
 
 
 
@@ -127,8 +177,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000003 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000000B Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000009 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000058 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -235,7 +285,11 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000000B Public STDCALL
+accumul_pow7 . . . . . . . . . .	P Near	 00000039 _TEXT	Length= 0000001F Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000044 _TEXT	
+  L2 . . . . . . . . . . . . . .	L Near	 00000052 _TEXT	
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000039 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000018 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -454,7 +508,6 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-arrayB . . . . . . . . . . . . .	Byte	 00000000 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
@@ -470,6 +523,7 @@ lightMagenta . . . . . . . . . .	Number	 0000000Dh
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+var1 . . . . . . . . . . . . . .	Byte	 00000000 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

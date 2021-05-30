@@ -16,7 +16,7 @@ main PROC
 	mov esi, OFFSET source
 	mov edi, OFFSET target
 	mov ecx, SIZEOF source
-	mov al, 0
+	mov al, 0	;set Null
 
 L :
 	mov [edi + ecx - 1], al
@@ -24,7 +24,7 @@ L :
 	inc esi
 	loop L
 	
-	call DumpRegs
+	;call DumpRegs
 
 	mov edx, OFFSET target
 	call WriteString	;povided by the Irvine library

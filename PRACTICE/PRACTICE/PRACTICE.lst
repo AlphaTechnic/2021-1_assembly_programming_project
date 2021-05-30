@@ -1,10 +1,10 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/20/21 05:21:12
-Tes							     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    05/30/21 10:18:30
+: sptenary to decima					     Page 1 - 1
 
 
-				TITLE Test
+				TITLE : sptenary to decimal
 
-				INCLUDE irvine32.inc
+				include Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
 			      C ;OPTION CASEMAP:NONE		; optional: make identifiers case-sensitive
@@ -24,17 +24,60 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/20/21 05:21:12
 			      C 
 
  00000000			.data
- 00000000 00 10 20		arrayB BYTE 00h, 10h, 20h
+ 00000000 0123				var1 dw 123h
+ 00000002  0000000F [			decimal db 15 dup ('$')
+	    24
+	   ]
 
  00000000			.code
- 00000000			main PROC
- 00000000  66| A1			mov ax, word ptr arrayB
+ 00000000			main proc
+ 00000000  66| A1			mov ax, var1
 	   00000000 R
- 00000006  E8 00000000 E		call DumpRegs
- 0000000B			main ENDP
-				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    04/20/21 05:21:12
-Tes							     Symbols 2 - 1
+ 00000006  8D 15 00000002 R		lea edx, decimal
+ 0000000C  E8 0000000F			call SEPTTODEC
+
+
+ 00000011  66| 8D 15			lea dx, decimal
+	   00000002 R
+ 00000018  B4 09			mov ah, 9 
+ 0000001A  CD 21			int 21h
+ 0000001C  B4 4C			mov ah, 4ch
+ 0000001E  CD 21			int 21h
+ 00000020			main ENDP
+					
+
+
+
+				;------------------------------------------------------------------
+ 00000020			SEPTTODEC PROC 
+ 00000020  66| B9 0000			mov cx,0 
+ 00000024  66| BB 000A			mov bx,10
+
+ 00000028  66| BA 0000		L1: mov dx,0
+ 0000002C  66| F7 F3			div bx ; EAX will store quotient and DX will store remainder
+ 0000002F  80 C2 30			ADD dl, 30h ; Add 30H in order to make it an ASCII character
+
+ 00000032  66| 52			push dx ; temporarily store DX value to stack
+ 00000034  66| 41			inc cx
+
+ 00000036  66| B9 000F			mov cx,15 ; assuming user may input upto 15 digits ie max. length of array
+ 0000003A  83 F8 09			cmp eax, 9 ; continue dividing EAX till the value stored is greater than 9
+ 0000003D  7F E9			jg L1
+
+ 0000003F  04 30			add al, 30h
+ 00000041  8A D0			mov dl, al ; converting the last remainder to character array and storing in array register DI
+
+ 00000043  58			L2: pop eax
+ 00000044  FE C2			inc dl ; increment destination pointer
+ 00000046  8A D0			MOV dl, al
+ 00000048  E2 F9			LOOP L2
+ 0000004A  C3				ret
+ 0000004B  66| 8B C7			MOV AX, DI ; Copy contents from DI to EAX register
+ 0000004E			SEPTTODEC ENDP
+
+				end main
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    05/30/21 10:18:30
+: sptenary to decima					     Symbols 2 - 1
 
 
 
@@ -127,8 +170,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000003 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000000B Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000011 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000004E Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -198,6 +241,9 @@ ReadInt  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 ReadKeyFlush . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadKey  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ReadString . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+SEPTTODEC  . . . . . . . . . . .	P Near	 00000020 _TEXT	Length= 0000002E Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000028 _TEXT	
+  L2 . . . . . . . . . . . . . .	L Near	 00000043 _TEXT	
 SetConsoleCursorInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleCursorPosition . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 SetConsoleMode . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -235,7 +281,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000000B Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000020 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -454,11 +500,11 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-arrayB . . . . . . . . . . . . .	Byte	 00000000 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+decimal  . . . . . . . . . . . .	Byte	 00000002 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
@@ -470,6 +516,7 @@ lightMagenta . . . . . . . . . .	Number	 0000000Dh
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+var1 . . . . . . . . . . . . . .	Word	 00000000 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
