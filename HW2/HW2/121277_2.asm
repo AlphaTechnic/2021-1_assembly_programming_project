@@ -17,7 +17,7 @@ L1:
 	mov edx, offset prompt1
 	call WriteString
 	call Readhex
-	jz L2							; enter key를 입력받으면 zf가 set된다.
+	jz nxt							; enter key를 입력받으면 zf가 set된다.
 
 	push eax
 	
@@ -26,7 +26,7 @@ L1:
 	mov edx, offset prompt2
 	call WriteString
 	call Readhex
-	jz L2
+	jz nxt
 
 	push eax
 	

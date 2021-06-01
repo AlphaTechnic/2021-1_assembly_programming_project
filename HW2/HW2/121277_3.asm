@@ -1,4 +1,4 @@
-TITLE : Pattern matching
+TITLE : Word matching
 
 include Irvine32.inc
 
@@ -9,7 +9,8 @@ include Irvine32.inc
 	ans1 byte "Found", 0
 	ans2 byte "Not Found", 0
 
-	MAX = 40
+	MAX_BUF_LEN = 45
+	MAX_INPUT_LEN = 40
 	text byte 45 DUP(?)
 	pat byte 45 dup(?)
 	lenoftext dword 0
@@ -18,32 +19,36 @@ include Irvine32.inc
 
 .code
 main proc
-L0:
+L1:
 	; prompt1 출력
 	mov edx, offset prompt1
 	call Writestring
 
 	; text 입력받음
 	mov edx, offset text
-	mov ecx, 50
+	mov ecx, MAX_BUF_LEN				; buf의 길이를 여유있게 45 정도로 설정
 	call readstring
 	jz THEEND							; enter key - 종료조건
 
 	call Crlf
+	cmp eax, MAX_INPUT_LEN				; 입력받은 text의 길이가 40 초과인 경우 다시 입력을 받음
+	ja L1								
 	mov lenoftext, eax					; text 길이 저장
 	
-
+L2:
 	; prompt2 출력
 	mov edx, offset prompt2
 	call Writestring
 
 	; pat 입력받음
-	mov edx, offset pat
-	mov ecx, 50
+	mov edx, offset pat					
+	mov ecx, MAX_BUF_LEN				; buf의 길이를 여유있게 45 정도로 설정
 	call readstring
 	jz THEEND							; enter key - 종료조건
 
 	call Crlf
+	cmp eax, MAX_INPUT_LEN				; 입력받은 pat의 길이가 40 초과인 경우 다시 입력을 받음
+	ja L2
 	mov lenofpat, eax					; pattern 길이 저장
 
 
@@ -113,7 +118,7 @@ OK:
 	
 	mov ebx, [lenofpat]
 	sub esi, ebx						; esi holds ans_esi - len(pat)
-	add edi, 1							; edi holds ans_esi + 1
+										; edi holds ans_esi
 
 MOVE_CHAR:
 	mov al, byte ptr [edi]
@@ -134,7 +139,7 @@ L3:
 	call crlf
 	call crlf 
 
-	jmp L0								; 다시 사용자의 입력을 기다린다.
+	jmp L1								; 다시 사용자의 입력을 기다린다.
 
 
 FAIL:
@@ -152,7 +157,7 @@ FAIL:
 	call crlf
 	call crlf 
 
-	jmp L0								; 다시 사용자의 입력을 기다린다.
+	jmp L1								; 다시 사용자의 입력을 기다린다.
 
 
 THEEND:

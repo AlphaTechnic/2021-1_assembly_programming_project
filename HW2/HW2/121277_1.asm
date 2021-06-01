@@ -1,4 +1,4 @@
-TITLE : septenary to decimal
+TITLE : Septenary to Decimal
 
 include Irvine32.inc
 
