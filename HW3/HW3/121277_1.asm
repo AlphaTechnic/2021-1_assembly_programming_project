@@ -24,8 +24,8 @@ INCLUDE irvine32.inc
 	even_iter dword 1 dup(?)
 
 .code
-main PROC
-	; prompt1 출력
+main PROC	; prompt1 출력
+	call Clrscr
 	mov edx, offset prompt1
 	call Writestring
 	; data 출력
@@ -104,6 +104,7 @@ loop2:
 	call Writestring
 
 	call crlf
+	exit
 
 main ENDP
 

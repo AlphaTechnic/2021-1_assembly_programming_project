@@ -1,23 +1,15 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 17:38:08
-%Summing the gaps between Array Value			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 03:12:42
+Get frequencie						     Page 1 - 1
 
 
-				TITLE Summing the gaps between Array Values
-				;Make a program that sorts number pairs (X, Y). The program should sort all pairs based on X
-				;values and if two pairs¡¯ X values are same, then sort it based on Y values. For sorting, you
-				;should differentiate the order on odd index pairs and even index pairs. The odd index pairs should
-				;be sorted in ascending order for X values and in descending order for Y values in case of same X
-				;values between pairs. The even index pairs should be sorted in descending order for X values and
-				;in ascending order for Y values in case of same X values.
-				;Assume that pairs are given like (0x51, 0x13), (0x1, 0x1), (0x2, 0x3), (0x1, 0x5), (0x51, 0x21), 
-				;(0x2, 0x1), (0x1, 0x2).
-				;
-				;input :
-				;hw3.inc
-				;
+				TITLE Get frequencies
+				;Write a procedure named Get_frequencies that constructs a character frequency table. Input to the
+				;procedure should be a pointer to a string and a pointer to an array of 256 doublewords initialized
+				;to all zeros. Each array position is indexed by its corresponding ASCII code. When the procedure
+				;returns, each entry in the array contains a count of how many times the corresponding character
+				;occurred in the string.
 
-
-				INCLUDE irvine32.inc
+				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
 			      C ;OPTION CASEMAP:NONE		; optional: make identifiers case-sensitive
@@ -35,206 +27,121 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 17:38:08
 			      C .NOLIST
 			      C .LIST
 			      C 
+
+				Get_frequencies PROTO,
+				    pString:PTR BYTE,   ; points to string
+				    pTable:PTR DWORD    ; points to frequency table
+
  00000000			.data
-					INCLUDE hw3.inc
- 00000000 00000008	      C LenData DWORD 8
- 00000004 00510013	      C ArrData DWORD 510013h, 10001h, 20003h, 10005h, 510021h, 20001h, 10002h, 10002h
-	   00010001
-	   00020003
-	   00010005
-	   00510021
-	   00020001
-	   00010002
-	   00010002
-			      C 
- 00000024 42 65 66 6F 72		prompt1 byte "Before sort : ", 0
-	   65 20 73 6F 72
-	   74 20 3A 20 00
- 00000033 41 66 74 65 72		prompt2 byte "After sort : ", 0
-	   20 73 6F 72 74
-	   20 3A 20 00
- 00000041 42 79 65 21 20		prompt3 byte "Bye! ", 0
+ 00000000 41 41 42 42 43	target BYTE "AABBCCDDEEFF", 0
+	   43 44 44 45 45
+	   46 46 00
+ 0000000D  00000100 [		freqTable DWORD 256 DUP(0)
+	    00000000
+	   ]
+
+ 0000040D 53 74 72 69 6E	prompt1 BYTE "String : ", 0
+	   67 20 3A 20 00
+ 00000417 49 6E 64 65 78	prompt2 BYTE "Index      FreqTable", 0
+	   20 20 20 20 20
+	   20 46 72 65 71
+	   54 61 62 6C 65
 	   00
- 00000047 2C 20 00			seperator byte ", ", 0
- 0000004A  00000001 [			odd_iter dword 1 dup(?)
-	    00000000
-	   ]
- 0000004E  00000001 [			even_iter dword 1 dup(?)
-	    00000000
-	   ]
 
  00000000			.code
  00000000			main PROC
-					; prompt1 Ãâ·Â
- 00000000  BA 00000024 R		mov edx, offset prompt1
- 00000005  E8 00000000 E		call Writestring
-					; data Ãâ·Â
- 0000000A  8B 0D 00000000 R		mov ecx, LenData
- 00000010  83 E9 01			sub ecx, 1
- 00000013  BE 00000004 R		mov esi, offset ArrData
-
- 00000018  8B 06			mov eax, [esi]
- 0000001A  E8 00000000 E		call Writehex
- 0000001F  83 C6 04			add esi, type ArrData
- 00000022			loop1:
- 00000022  8B 06			mov eax, [esi]
- 00000024  BA 00000047 R		mov edx, offset seperator
- 00000029  E8 00000000 E		call Writestring
- 0000002E  E8 00000000 E		call Writehex
- 00000033  83 C6 04			add esi, type ArrData
- 00000036  E2 EA			loop loop1
-
- 00000038  E8 00000000 E		call crlf
+ 00000000  E8 0000001B		    call display_string
+				    INVOKE Get_frequencies, ADDR target, ADDR freqTable
+ 00000014  E8 00000057		    call DisplayTable
+				    exit
+ 00000020			main ENDP
 
 
- 0000003D  A1 00000000 R		mov eax, LenData
- 00000042  D1 C8			ror eax, 1 ; CF º¸°í Â¦¼öÀÎÁö È¦¼öÀÎÁö
- 00000044  72 10			jc L_odd;
+ 00000020			display_string proc
+ 00000020  E8 00000000 E	    call Clrscr
+ 00000025  BA 0000040D R	    mov  edx, offset prompt1
+ 0000002A  E8 00000000 E	    call WriteString
+ 0000002F  BA 00000000 R	    mov  edx, offset target
+ 00000034  E8 00000000 E	    call WriteString
+ 00000039  E8 00000000 E	    call crlf
+ 0000003E  E8 00000000 E	    call crlf
 
- 00000046			L_even:
- 00000046  D1 C0			rol eax, 1 ; ¿ø»óº¹±¸
- 00000048  D1 E8			shr eax, 1
-
- 0000004A  A3 0000004A R		mov odd_iter, eax
- 0000004F  A3 0000004E R		mov even_iter, eax
-
- 00000054  EB 1A			jmp L1
-
- 00000056			L_odd:
- 00000056  D1 C0			rol eax, 1 ; ¿ø»óº¹±¸
- 00000058  83 C0 01			add eax, 1
- 0000005B  D1 E8			shr eax, 1
-					
- 0000005D  8B 1D 00000000 R		mov ebx, LenData
- 00000063  2B D8			sub ebx, eax
-
- 00000065  A3 0000004A R		mov odd_iter, eax
- 0000006A  89 1D 0000004E R		mov even_iter, ebx
-
-					
-				;-------------------------------------------------------
- 00000070			L1:
- 00000070  E8 00000051			call BubbleSort_oddind
- 00000075  E8 0000008D			call BubbleSort_evenind	
-
- 0000007A			THEEND:
-					; prompt2 Ãâ·Â
- 0000007A  BA 00000033 R		mov edx, offset prompt2
- 0000007F  E8 00000000 E		call Writestring
-					; data Ãâ·Â
- 00000084  8B 0D 00000000 R		mov ecx, LenData
- 0000008A  83 E9 01			sub ecx, 1
- 0000008D  BE 00000004 R		mov esi, offset ArrData
-
- 00000092  8B 06			mov eax, [esi]
- 00000094  E8 00000000 E		call Writehex
- 00000099  83 C6 04			add esi, type ArrData
- 0000009C			loop2:
- 0000009C  8B 06			mov eax, [esi]
- 0000009E  BA 00000047 R		mov edx, offset seperator
- 000000A3  E8 00000000 E		call Writestring
- 000000A8  E8 00000000 E		call Writehex
- 000000AD  83 C6 04			add esi, type ArrData
- 000000B0  E2 EA			loop loop2
-
- 000000B2  E8 00000000 E		call crlf
-
-					; prompt3 Ãâ·Â
- 000000B7  BA 00000041 R		mov edx, offset prompt3
- 000000BC  E8 00000000 E		call Writestring
-
- 000000C1  E8 00000000 E		call crlf
-
- 000000C6			main ENDP
+ 00000043  BA 00000417 R	    mov  edx, offset prompt2
+ 00000048  E8 00000000 E	    call WriteString
+ 0000004D			display_string endp
 
 
-				;-----------------------------------------------------
-				; BubbleSort_oddind - Sort data with odd index. X : ascending, Y : descending
-				; Recieves - ArrData, odd_iter
-				; Returns -  nothing
-				;-----------------------------------------------------
- 000000C6			BubbleSort_oddind PROC USES eax ecx esi
- 000000C9  8B 0D 0000004A R		mov ecx, odd_iter
- 000000CF  49				dec ecx
- 000000D0			L1: 
- 000000D0  51				push ecx ; decrement count by 1
- 000000D1  BE 00000004 R		mov esi, offset ArrData ; point to first value
+				;-------------------------------------------------------------
+ 0000004D			Get_frequencies PROC,
+				    pString:PTR BYTE,   ; points to string
+				    pTable:PTR DWORD    ; points to frequencey table
+				; Recieves : pString, pTable
+				; Returns : freqTable
+				;-------------------------------------------------------------
+ 00000050  8B 75 08		    mov esi, pString
+ 00000053  8B 7D 0C		    mov edi, pTable
 
- 000000D6			L_x: ; x °ª ºñ±³
- 000000D6  66| 8B 46 02			mov ax, word ptr [esi + 2] ; get array value
- 000000DA  66| 3B 46 0A			cmp ax, word ptr [esi+10] ; compare a pair of values
- 000000DE  7C 1B			jl nxt ; if [ESI+2]<[ESI+10], no exchange
- 000000E0  74 09			je L_incaseof_xeq ;
-					
- 000000E2  8B 06			mov eax, [esi]
- 000000E4  87 46 08			xchg eax, [esi+8] ; exchange the pair
- 000000E7  89 06			mov [esi], eax
- 000000E9  EB 10			jmp nxt
+ 00000056			L1: 
+ 00000056  B8 00000000		    mov eax, 0
+ 0000005B  8A 06		    mov al, [esi]
+ 0000005D  83 C6 01		    add esi, 1
 
- 000000EB			L_incaseof_xeq: ; x°¡ °°Àº °æ¿ì y Á¤·ÄÀº descending
- 000000EB  66| 8B 06			mov ax, word ptr [esi] ; get array value
- 000000EE  66| 3B 46 08			cmp ax, word ptr [esi+8] ; compare a pair of values
- 000000F2  7F 07			jg nxt ; if [ESI]>[ESI+8], no exchange
+ 00000060  3C 00		    cmp al, 0     ; EOF check
+ 00000062  74 08		    je THEEND 
+				    
+ 00000064  C1 E0 02		    shl eax,2        ; multiply by 4
+ 00000067  FF 04 07		    inc DWORD PTR [edi + eax]    ; inc table[AL]
+ 0000006A  EB EA		    jmp L1       ; repeat loop
 
- 000000F4  8B 06			mov eax, [esi]
- 000000F6  87 46 08			xchg eax, [esi+8] ; exchange the pair
- 000000F9  89 06			mov [esi], eax
+ 0000006C			THEEND:
+				    ret
 
- 000000FB			nxt: ; ´ÙÀ½ ºñ±³ ´ë»óÀ¸·Î ÁøÇà
- 000000FB  83 C6 08			add esi, 8 ; move both pointers forward
- 000000FE  E2 D6			loop L_x ; inner loop
- 00000100  59				pop ecx ; retrieve out loop count
- 00000101  E2 CD			loop L1 ; else repeat outer loop
-
-					ret
- 00000107			BubbleSort_oddind ENDP
+ 00000070			Get_frequencies ENDP
 
 
-				;-----------------------------------------------------
-				; BubbleSort_evenind - Sort data with odd index. X : descending, Y : ascending
-				; Recieves - ArrData, even_iter
-				; Returns -  nothing
-				;-----------------------------------------------------
- 00000107			BubbleSort_evenind PROC USES eax ecx esi
- 0000010A  8B 0D 0000004E R		mov ecx, even_iter
- 00000110  49				dec ecx
- 00000111			L1: 
- 00000111  51				push ecx ; decrement count by 1
- 00000112  BE 00000004 R		mov esi, offset ArrData ; point to first value
- 00000117  83 C6 04			add esi, 4
+				;-------------------------------------------------------------
+ 00000070			DisplayTable PROC
+				;
+				; Display the non-empty entries of the frequency table.
+				; This procedure was not required, but it makes it easier
+				; to demonstrate that Get_frequencies works.
+				;-------------------------------------------------------------
 
- 0000011A			L_x: ; x °ª ºñ±³
- 0000011A  66| 8B 46 02			mov ax, word ptr [esi + 2] ; get array value
- 0000011E  66| 3B 46 0A			cmp ax, word ptr [esi+10] ; compare a pair of values
- 00000122  7F 1B			jg nxt ; if [ESI+2]<[ESI+10], no exchange
- 00000124  74 09			je L_incaseof_xeq ;
-					
- 00000126  8B 06			mov eax, [esi]
- 00000128  87 46 08			xchg eax, [esi+8] ; exchange the pair
- 0000012B  89 06			mov [esi], eax
- 0000012D  EB 10			jmp nxt
+ 0000042C			.data
+ 0000042C 20 20 20 20 20	    colonStr BYTE "      ",0
+	   20 00
+ 00000070			.code
+ 00000070  E8 00000000 E	    call Crlf
+ 00000075  B9 00000100		    mov ecx,LENGTHOF freqTable    ; entries to show
+ 0000007A  BE 0000000D R	    mov esi,OFFSET freqTable
+ 0000007F  BB 00000000		    mov ebx,0 ; index counter
 
- 0000012F			L_incaseof_xeq: ; x°¡ °°Àº °æ¿ì y Á¤·ÄÀº ascending
- 0000012F  66| 8B 06			mov ax, word ptr [esi] ; get array value
- 00000132  66| 3B 46 08			cmp ax, word ptr [esi+8] ; compare a pair of values
- 00000136  7C 07			jl nxt ; if [ESI]>[ESI+8], no exchange
+ 00000084			 L1:    
+ 00000084  8B 06		    mov eax,[esi]   ; get frequency count
+ 00000086  83 F8 00		    cmp eax,0   ; count = 0?
+ 00000089  76 1D		    jna L2  ; if so, skip to next entry
 
- 00000138  8B 06			mov eax, [esi]
- 0000013A  87 46 08			xchg eax, [esi+8] ; exchange the pair
- 0000013D  89 06			mov [esi], eax
+ 0000008B  8B C3		    mov eax,ebx    ; display the index
+ 0000008D  E8 00000000 E	    call Writehex
+ 00000092  BA 0000042C R	    mov edx, OFFSET colonStr    ; display ": "
+ 00000097  E8 00000000 E	    call WriteString
+ 0000009C  8B 06		    mov eax, [esi]  ; show frequency count
+ 0000009E  E8 00000000 E	    call WriteDec
+ 000000A3  E8 00000000 E	    call Crlf
 
- 0000013F			nxt: ; ´ÙÀ½ ºñ±³ ´ë»óÀ¸·Î ÁøÇà
- 0000013F  83 C6 08			add esi, 8 ; move both pointers forward
- 00000142  E2 D6			loop L_x ; inner loop
- 00000144  59				pop ecx ; retrieve out loop count
- 00000145  E2 CA			loop L1 ; else repeat outer loop
+ 000000A8			L2:   
+ 000000A8  83 C6 04		    add esi,TYPE freqTable  ; point to next table entry
+ 000000AB  43			    inc ebx ; increment index
+ 000000AC  E2 D6		    loop L1
 
-					ret
- 0000014B			BubbleSort_evenind ENDP
+ 000000AE  E8 00000000 E	    call Crlf
+
+ 000000B3  C3			    ret
+ 000000B4			    DisplayTable ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 17:38:08
-%Summing the gaps between Array Value			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 03:12:42
+Get frequencie						     Symbols 2 - 1
 
 
 
@@ -327,24 +234,14 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000052 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000014B Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000433 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000B4 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
-BubbleSort_evenind . . . . . . .	P Near	 00000107 _TEXT	Length= 00000044 Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 00000111 _TEXT	
-  L_x  . . . . . . . . . . . . .	L Near	 0000011A _TEXT	
-  L_incaseof_xeq . . . . . . . .	L Near	 0000012F _TEXT	
-  nxt  . . . . . . . . . . . . .	L Near	 0000013F _TEXT	
-BubbleSort_oddind  . . . . . . .	P Near	 000000C6 _TEXT	Length= 00000041 Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 000000D0 _TEXT	
-  L_x  . . . . . . . . . . . . .	L Near	 000000D6 _TEXT	
-  L_incaseof_xeq . . . . . . . .	L Near	 000000EB _TEXT	
-  nxt  . . . . . . . . . . . . .	L Near	 000000FB _TEXT	
 CloseFile  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 CloseHandle  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Clrscr . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -352,6 +249,9 @@ CreateFileA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 CreateOutputFile . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Crlf . . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Delay  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+DisplayTable . . . . . . . . . .	P Near	 00000070 _TEXT	Length= 00000044 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000084 _TEXT	
+  L2 . . . . . . . . . . . . . .	L Near	 000000A8 _TEXT	
 DumpMem  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ExitProcess  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -378,6 +278,11 @@ GetStdHandle . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 GetSystemTime  . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetTextColor . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetTickCount . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+Get_frequencies  . . . . . . . .	P Near	 0000004D _TEXT	Length= 00000023 Public STDCALL
+  pString  . . . . . . . . . . .	DWord	 bp + 00000008
+  pTable . . . . . . . . . . . .	DWord	 bp + 0000000C
+  L1 . . . . . . . . . . . . . .	L Near	 00000056 _TEXT	
+  THEEND . . . . . . . . . . . .	L Near	 0000006C _TEXT	
 Gotoxy . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapAlloc  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -445,13 +350,8 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000C6 Public STDCALL
-  loop1  . . . . . . . . . . . .	L Near	 00000022 _TEXT	
-  L_even . . . . . . . . . . . .	L Near	 00000046 _TEXT	
-  L_odd  . . . . . . . . . . . .	L Near	 00000056 _TEXT	
-  L1 . . . . . . . . . . . . . .	L Near	 00000070 _TEXT	
-  THEEND . . . . . . . . . . . .	L Near	 0000007A _TEXT	
-  loop2  . . . . . . . . . . . .	L Near	 0000009C _TEXT	
+display_string . . . . . . . . .	P Near	 00000020 _TEXT	Length= 0000002D Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000020 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -471,7 +371,6 @@ Symbols:
 @fardata . . . . . . . . . . . .	Text   	 FLAT
 @stack . . . . . . . . . . . . .	Text   	 FLAT
 ALT_MASK . . . . . . . . . . . .	Number	 00000003h   
-ArrData  . . . . . . . . . . . .	DWord	 00000004 _DATA	
 CAPSLOCK_ON  . . . . . . . . . .	Number	 00000080h   
 CREATE_ALWAYS  . . . . . . . . .	Number	 00000002h   
 CREATE_NEW . . . . . . . . . . .	Number	 00000001h   
@@ -544,7 +443,6 @@ KEY_EVENT  . . . . . . . . . . .	Number	 00000001h
 KEY_MASKS  . . . . . . . . . . .	Number	 0000001Fh   
 LEFT_ALT_PRESSED . . . . . . . .	Number	 00000002h   
 LEFT_CTRL_PRESSED  . . . . . . .	Number	 00000008h   
-LenData  . . . . . . . . . . . .	DWord	 00000000 _DATA	
 MB_ABORTRETRYIGNORE  . . . . . .	Number	 00000002h   
 MB_APPLMODAL . . . . . . . . . .	Number	 00000000h   
 MB_CANCELTRYCONTINUE . . . . . .	Number	 00000006h   
@@ -675,9 +573,10 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
+colonStr . . . . . . . . . . . .	Byte	 0000042C _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
-even_iter  . . . . . . . . . . .	DWord	 0000004E _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
+freqTable  . . . . . . . . . . .	DWord	 0000000D _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
@@ -687,12 +586,10 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-odd_iter . . . . . . . . . . . .	DWord	 0000004A _DATA	
-prompt1  . . . . . . . . . . . .	Byte	 00000024 _DATA	
-prompt2  . . . . . . . . . . . .	Byte	 00000033 _DATA	
-prompt3  . . . . . . . . . . . .	Byte	 00000041 _DATA	
+prompt1  . . . . . . . . . . . .	Byte	 0000040D _DATA	
+prompt2  . . . . . . . . . . . .	Byte	 00000417 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-seperator  . . . . . . . . . . .	Byte	 00000047 _DATA	
+target . . . . . . . . . . . . .	Byte	 00000000 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
