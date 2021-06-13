@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 13:59:25
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 17:38:08
 %Summing the gaps between Array Value			     Page 1 - 1
 
 
@@ -37,54 +37,203 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 13:59:25
 			      C 
  00000000			.data
 					INCLUDE hw3.inc
- 00000000 00000007	      C LenData DWORD 7
- 00000004 00510013	      C ArrData DWORD 510013h, 10001h, 20003h, 10005h, 510021h, 20001h, 10002h
+ 00000000 00000008	      C LenData DWORD 8
+ 00000004 00510013	      C ArrData DWORD 510013h, 10001h, 20003h, 10005h, 510021h, 20001h, 10002h, 10002h
 	   00010001
 	   00020003
 	   00010005
 	   00510021
 	   00020001
 	   00010002
+	   00010002
 			      C 
- 00000020 42 65 66 6F 72		prompt1 byte "Before sort : ", 0
+ 00000024 42 65 66 6F 72		prompt1 byte "Before sort : ", 0
 	   65 20 73 6F 72
 	   74 20 3A 20 00
- 0000002F 41 66 74 65 72		prompt2 byte "After sort : ", 0
+ 00000033 41 66 74 65 72		prompt2 byte "After sort : ", 0
 	   20 73 6F 72 74
 	   20 3A 20 00
- 0000003D 42 79 65 21 20		prompt3 byte "Bye! ", 0
+ 00000041 42 79 65 21 20		prompt3 byte "Bye! ", 0
 	   00
+ 00000047 2C 20 00			seperator byte ", ", 0
+ 0000004A  00000001 [			odd_iter dword 1 dup(?)
+	    00000000
+	   ]
+ 0000004E  00000001 [			even_iter dword 1 dup(?)
+	    00000000
+	   ]
 
  00000000			.code
  00000000			main PROC
-					;debug
- 00000000  BE 00000004 R		mov esi, offset ArrData
- 00000005  66| 8B 1E			mov bx, word ptr [esi]
- 00000008  83 C6 02			add esi, type ax
- 0000000B  66| 8B 06			mov ax, word ptr [esi]
-					;add esi, type ax
-					;mov ax, word ptr [esi]
-					;add esi, type ax
-					;mov bx, word ptr [esi]
+					; prompt1 출력
+ 00000000  BA 00000024 R		mov edx, offset prompt1
+ 00000005  E8 00000000 E		call Writestring
+					; data 출력
+ 0000000A  8B 0D 00000000 R		mov ecx, LenData
+ 00000010  83 E9 01			sub ecx, 1
+ 00000013  BE 00000004 R		mov esi, offset ArrData
 
- 0000000E  A1 00000000 R		mov eax, LenData
- 00000013  D0 C8			ror al, 1 ; CF 보고 짝수인지 홀수인지
- 00000015  72 04			jc L_odd;
- 00000017  72 04			jc L_even;
- 00000019  D0 C0			rol al, 1 ; 원상복구
+ 00000018  8B 06			mov eax, [esi]
+ 0000001A  E8 00000000 E		call Writehex
+ 0000001F  83 C6 04			add esi, type ArrData
+ 00000022			loop1:
+ 00000022  8B 06			mov eax, [esi]
+ 00000024  BA 00000047 R		mov edx, offset seperator
+ 00000029  E8 00000000 E		call Writestring
+ 0000002E  E8 00000000 E		call Writehex
+ 00000033  83 C6 04			add esi, type ArrData
+ 00000036  E2 EA			loop loop1
 
- 0000001B			L_odd:
- 0000001B  D0 C0			rol al, 1 ; 원상복구
+ 00000038  E8 00000000 E		call crlf
 
- 0000001D			L_even:
- 0000001D  D0 C0			rol al, 1 ; 원상복구
 
- 0000001F  E8 00000000 E		call dumpregs
+ 0000003D  A1 00000000 R		mov eax, LenData
+ 00000042  D1 C8			ror eax, 1 ; CF 보고 짝수인지 홀수인지
+ 00000044  72 10			jc L_odd;
 
- 00000024			main ENDP
+ 00000046			L_even:
+ 00000046  D1 C0			rol eax, 1 ; 원상복구
+ 00000048  D1 E8			shr eax, 1
+
+ 0000004A  A3 0000004A R		mov odd_iter, eax
+ 0000004F  A3 0000004E R		mov even_iter, eax
+
+ 00000054  EB 1A			jmp L1
+
+ 00000056			L_odd:
+ 00000056  D1 C0			rol eax, 1 ; 원상복구
+ 00000058  83 C0 01			add eax, 1
+ 0000005B  D1 E8			shr eax, 1
+					
+ 0000005D  8B 1D 00000000 R		mov ebx, LenData
+ 00000063  2B D8			sub ebx, eax
+
+ 00000065  A3 0000004A R		mov odd_iter, eax
+ 0000006A  89 1D 0000004E R		mov even_iter, ebx
+
+					
+				;-------------------------------------------------------
+ 00000070			L1:
+ 00000070  E8 00000051			call BubbleSort_oddind
+ 00000075  E8 0000008D			call BubbleSort_evenind	
+
+ 0000007A			THEEND:
+					; prompt2 출력
+ 0000007A  BA 00000033 R		mov edx, offset prompt2
+ 0000007F  E8 00000000 E		call Writestring
+					; data 출력
+ 00000084  8B 0D 00000000 R		mov ecx, LenData
+ 0000008A  83 E9 01			sub ecx, 1
+ 0000008D  BE 00000004 R		mov esi, offset ArrData
+
+ 00000092  8B 06			mov eax, [esi]
+ 00000094  E8 00000000 E		call Writehex
+ 00000099  83 C6 04			add esi, type ArrData
+ 0000009C			loop2:
+ 0000009C  8B 06			mov eax, [esi]
+ 0000009E  BA 00000047 R		mov edx, offset seperator
+ 000000A3  E8 00000000 E		call Writestring
+ 000000A8  E8 00000000 E		call Writehex
+ 000000AD  83 C6 04			add esi, type ArrData
+ 000000B0  E2 EA			loop loop2
+
+ 000000B2  E8 00000000 E		call crlf
+
+					; prompt3 출력
+ 000000B7  BA 00000041 R		mov edx, offset prompt3
+ 000000BC  E8 00000000 E		call Writestring
+
+ 000000C1  E8 00000000 E		call crlf
+
+ 000000C6			main ENDP
+
+
+				;-----------------------------------------------------
+				; BubbleSort_oddind - Sort data with odd index. X : ascending, Y : descending
+				; Recieves - ArrData, odd_iter
+				; Returns -  nothing
+				;-----------------------------------------------------
+ 000000C6			BubbleSort_oddind PROC USES eax ecx esi
+ 000000C9  8B 0D 0000004A R		mov ecx, odd_iter
+ 000000CF  49				dec ecx
+ 000000D0			L1: 
+ 000000D0  51				push ecx ; decrement count by 1
+ 000000D1  BE 00000004 R		mov esi, offset ArrData ; point to first value
+
+ 000000D6			L_x: ; x 값 비교
+ 000000D6  66| 8B 46 02			mov ax, word ptr [esi + 2] ; get array value
+ 000000DA  66| 3B 46 0A			cmp ax, word ptr [esi+10] ; compare a pair of values
+ 000000DE  7C 1B			jl nxt ; if [ESI+2]<[ESI+10], no exchange
+ 000000E0  74 09			je L_incaseof_xeq ;
+					
+ 000000E2  8B 06			mov eax, [esi]
+ 000000E4  87 46 08			xchg eax, [esi+8] ; exchange the pair
+ 000000E7  89 06			mov [esi], eax
+ 000000E9  EB 10			jmp nxt
+
+ 000000EB			L_incaseof_xeq: ; x가 같은 경우 y 정렬은 descending
+ 000000EB  66| 8B 06			mov ax, word ptr [esi] ; get array value
+ 000000EE  66| 3B 46 08			cmp ax, word ptr [esi+8] ; compare a pair of values
+ 000000F2  7F 07			jg nxt ; if [ESI]>[ESI+8], no exchange
+
+ 000000F4  8B 06			mov eax, [esi]
+ 000000F6  87 46 08			xchg eax, [esi+8] ; exchange the pair
+ 000000F9  89 06			mov [esi], eax
+
+ 000000FB			nxt: ; 다음 비교 대상으로 진행
+ 000000FB  83 C6 08			add esi, 8 ; move both pointers forward
+ 000000FE  E2 D6			loop L_x ; inner loop
+ 00000100  59				pop ecx ; retrieve out loop count
+ 00000101  E2 CD			loop L1 ; else repeat outer loop
+
+					ret
+ 00000107			BubbleSort_oddind ENDP
+
+
+				;-----------------------------------------------------
+				; BubbleSort_evenind - Sort data with odd index. X : descending, Y : ascending
+				; Recieves - ArrData, even_iter
+				; Returns -  nothing
+				;-----------------------------------------------------
+ 00000107			BubbleSort_evenind PROC USES eax ecx esi
+ 0000010A  8B 0D 0000004E R		mov ecx, even_iter
+ 00000110  49				dec ecx
+ 00000111			L1: 
+ 00000111  51				push ecx ; decrement count by 1
+ 00000112  BE 00000004 R		mov esi, offset ArrData ; point to first value
+ 00000117  83 C6 04			add esi, 4
+
+ 0000011A			L_x: ; x 값 비교
+ 0000011A  66| 8B 46 02			mov ax, word ptr [esi + 2] ; get array value
+ 0000011E  66| 3B 46 0A			cmp ax, word ptr [esi+10] ; compare a pair of values
+ 00000122  7F 1B			jg nxt ; if [ESI+2]<[ESI+10], no exchange
+ 00000124  74 09			je L_incaseof_xeq ;
+					
+ 00000126  8B 06			mov eax, [esi]
+ 00000128  87 46 08			xchg eax, [esi+8] ; exchange the pair
+ 0000012B  89 06			mov [esi], eax
+ 0000012D  EB 10			jmp nxt
+
+ 0000012F			L_incaseof_xeq: ; x가 같은 경우 y 정렬은 ascending
+ 0000012F  66| 8B 06			mov ax, word ptr [esi] ; get array value
+ 00000132  66| 3B 46 08			cmp ax, word ptr [esi+8] ; compare a pair of values
+ 00000136  7C 07			jl nxt ; if [ESI]>[ESI+8], no exchange
+
+ 00000138  8B 06			mov eax, [esi]
+ 0000013A  87 46 08			xchg eax, [esi+8] ; exchange the pair
+ 0000013D  89 06			mov [esi], eax
+
+ 0000013F			nxt: ; 다음 비교 대상으로 진행
+ 0000013F  83 C6 08			add esi, 8 ; move both pointers forward
+ 00000142  E2 D6			loop L_x ; inner loop
+ 00000144  59				pop ecx ; retrieve out loop count
+ 00000145  E2 CA			loop L1 ; else repeat outer loop
+
+					ret
+ 0000014B			BubbleSort_evenind ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 13:59:25
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/13/21 17:38:08
 %Summing the gaps between Array Value			     Symbols 2 - 1
 
 
@@ -178,14 +327,24 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000043 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000024 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000052 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000014B Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
+BubbleSort_evenind . . . . . . .	P Near	 00000107 _TEXT	Length= 00000044 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000111 _TEXT	
+  L_x  . . . . . . . . . . . . .	L Near	 0000011A _TEXT	
+  L_incaseof_xeq . . . . . . . .	L Near	 0000012F _TEXT	
+  nxt  . . . . . . . . . . . . .	L Near	 0000013F _TEXT	
+BubbleSort_oddind  . . . . . . .	P Near	 000000C6 _TEXT	Length= 00000041 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 000000D0 _TEXT	
+  L_x  . . . . . . . . . . . . .	L Near	 000000D6 _TEXT	
+  L_incaseof_xeq . . . . . . . .	L Near	 000000EB _TEXT	
+  nxt  . . . . . . . . . . . . .	L Near	 000000FB _TEXT	
 CloseFile  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 CloseHandle  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Clrscr . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -286,9 +445,13 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000024 Public STDCALL
-  L_odd  . . . . . . . . . . . .	L Near	 0000001B _TEXT	
-  L_even . . . . . . . . . . . .	L Near	 0000001D _TEXT	
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000C6 Public STDCALL
+  loop1  . . . . . . . . . . . .	L Near	 00000022 _TEXT	
+  L_even . . . . . . . . . . . .	L Near	 00000046 _TEXT	
+  L_odd  . . . . . . . . . . . .	L Near	 00000056 _TEXT	
+  L1 . . . . . . . . . . . . . .	L Near	 00000070 _TEXT	
+  THEEND . . . . . . . . . . . .	L Near	 0000007A _TEXT	
+  loop2  . . . . . . . . . . . .	L Near	 0000009C _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -513,6 +676,7 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+even_iter  . . . . . . . . . . .	DWord	 0000004E _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
@@ -523,10 +687,12 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-prompt1  . . . . . . . . . . . .	Byte	 00000020 _DATA	
-prompt2  . . . . . . . . . . . .	Byte	 0000002F _DATA	
-prompt3  . . . . . . . . . . . .	Byte	 0000003D _DATA	
+odd_iter . . . . . . . . . . . .	DWord	 0000004A _DATA	
+prompt1  . . . . . . . . . . . .	Byte	 00000024 _DATA	
+prompt2  . . . . . . . . . . . .	Byte	 00000033 _DATA	
+prompt3  . . . . . . . . . . . .	Byte	 00000041 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+seperator  . . . . . . . . . . .	Byte	 00000047 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
