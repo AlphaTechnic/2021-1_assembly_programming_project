@@ -1,4 +1,10 @@
 TITLE : Multiplication by add and shift
+;Write a short program that calls the procedure and displays the produce. (Assume that the
+;produce is never larger than 32 bits.) This is a fairly challenging program to write. One
+;possible approach is to use a loop to shift the multiplier to the right, keeping track of the
+;number of shifts that occur before the Carry flag is set. The resulting shift count can then
+;be applied to the SHL instruction, using the multiplicand as the destination operand. Then,
+;the same process must be repeated until you find the last 1 bit in the multiplier.
 
 include Irvine32.inc
 

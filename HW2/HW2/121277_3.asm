@@ -1,4 +1,11 @@
 TITLE : Word matching
+;Make a program that takes a string and a word as inputs from the user and searches
+;the word in the string. If a word is in the string, delete it from the string. If it finds the word
+;in the string, it prints ¡°Found¡±, else it prints ¡°Not found¡±. Note that it is not searching for
+;the matching characters but searching for the corresponding word. For example, suppose a
+;string is ¡°I am a teacher.¡± and a word for search is ¡°tea¡±. Now the string has four words; I,
+;am, a, teacher. Now the searched word, ¡°tea¡± is not there. So, your program has to say, ¡°Not
+;found¡±.
 
 include Irvine32.inc
 

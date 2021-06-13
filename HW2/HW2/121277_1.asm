@@ -1,4 +1,10 @@
 TITLE : Septenary to Decimal
+;Write a program that transforms given positive integer (septenary number) (양의 정수)
+;(7 진수) into an decimal number (10 진수). Since we did not learn the input function, you have
+;to declare a specific variable var1 for the septenary number. After calculating decimal number,
+;then insert that in to the EAX. At the end of your code, use DumpRegs function to check
+;the EAX value. The following figure shows you the var1 format. (Other numbers will be used
+;instead of 65 when scoring.)
 
 include Irvine32.inc
 
