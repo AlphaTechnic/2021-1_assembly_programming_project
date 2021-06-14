@@ -45,10 +45,14 @@ INCLUDE Irvine32.inc
         dword 5
         dword exit_func
     NumberOfEntries = ($ - CaseTable) / EntrySize
-
-    MAX_BUF_LEN = 20
-    MAX_VALID_INPUT_LEN = 1
+    
+    YN_MAX_BUF_LEN = 10         ; Y / N answer buf
+    YN_MAX_VALID_INPUT_LEN = 1
     answer word 0
+
+    STRING_MAX_BUF_LEN = 10            ; input string buf
+	STRING_MAX_VALID_INPUT_LEN = 8
+    enter_val dword 0
     
 
 .code
@@ -133,10 +137,10 @@ L1:
     call writestring
 
     mov edx, offset answer
-    mov ecx, MAX_BUF_LEN
+    mov ecx, YN_MAX_BUF_LEN
     call readstring
     
-    cmp eax, MAX_VALID_INPUT_LEN
+    cmp eax, YN_MAX_VALID_INPUT_LEN
     jne L1
 
     cmp byte ptr [edx], 59h
@@ -165,14 +169,20 @@ check_answer endp
 and_func proc
 ; Display the string input by data segment.
 ;-------------------------------------------------------------------------------
+enter_x:
     mov edx, offset prompt_x
     call writestring
-    call Readhex
-    mov ebx, eax ; edx : x buffer
+    
+    call get_val
+    jc enter_x
+    mov ebx, eax        ; edx : x buffer
 
+enter_y:
     mov edx, offset prompt_y
     call writestring
-    call Readhex ; eax : y buffer
+   
+    call get_val
+    jc enter_y          ; eax : x buffer
 
     mov edx, offset prompt_resultAND
     call writestring
@@ -190,14 +200,20 @@ and_func endp
 or_func proc
 ; Display the string input by data segment.
 ;-------------------------------------------------------------------------------
+ enter_x:
     mov edx, offset prompt_x
     call writestring
-    call Readhex
-    mov ebx, eax ; edx : x buffer
+    
+    call get_val
+    jc enter_x
+    mov ebx, eax        ; ebx : x buffer
 
+enter_y:
     mov edx, offset prompt_y
     call writestring
-    call Readhex ; eax : y buffer
+   
+    call get_val
+    jc enter_y          ; eax : x buffer
 
     mov edx, offset prompt_resultAND
     call writestring
@@ -214,9 +230,13 @@ or_func endp
 not_func proc
 ; Display the string input by data segment.
 ;-------------------------------------------------------------------------------
+ enter_x:
     mov edx, offset prompt_x
     call writestring
-    call Readhex
+    
+    call get_val
+    jc enter_x
+    mov ebx, eax        ; ebx : x buffer
 
     mov edx, offset prompt_resultNOT
     call writestring
@@ -233,16 +253,22 @@ not_func endp
 xor_func proc
 ; Display the string input by data segment.
 ;-------------------------------------------------------------------------------
+ enter_x:
     mov edx, offset prompt_x
     call writestring
-    call Readhex
-    mov ebx, eax ; edx : x buffer
+    
+    call get_val
+    jc enter_x
+    mov ebx, eax        ; ebx : x buffer
 
+enter_y:
     mov edx, offset prompt_y
     call writestring
-    call Readhex ; eax : y buffer
+   
+    call get_val
+    jc enter_y          ; eax : x buffer
 
-    mov edx, offset prompt_resultAND
+    mov edx, offset prompt_resultXOR
     call writestring
     
     ;calculate
@@ -252,6 +278,100 @@ xor_func proc
 THEEND:
     ret
 xor_func endp
+
+
+
+;-------------------------------------------------------------------------------
+get_val proc uses ebx
+; Display the string input by data segment.
+;-------------------------------------------------------------------------------
+B:
+	mov eax, 0
+	mov ebx, 0
+
+	mov edx, offset enter_val
+	mov ecx, STRING_MAX_BUF_LEN
+	call readstring
+	
+	cmp eax, STRING_MAX_VALID_INPUT_LEN  ;STRING_MAX_VALID_INPUT_LEN = 8
+	ja FAIL
+    cmp eax, 0
+    je FAIL
+	mov ecx, eax
+
+	mov esi, offset enter_val
+
+L1:
+	mov al, byte ptr [esi]	
+	cmp al, 30h
+	jb FAIL
+	cmp al, 39h
+	jbe zone1
+
+	cmp al, 41h
+	jb FAIL
+	cmp al, 46h
+	jbe zone2
+
+	cmp al, 61h
+	jb FAIL
+	cmp al, 66h
+	jbe zone3
+    
+    jmp FAIL 
+
+zone1:                  ; ascii 30h ~ 39h ('0' ~ '9')
+	shl ebx, 4
+
+	sub al, 30h
+	and al, 0Fh
+	or bl, al
+
+	add esi, 1
+
+	sub ecx, 1
+	cmp ecx, 0
+	jne L1
+	jmp SUCCESS
+
+zone2:                  ; ascii 41h ~ 46h ('A' ~ 'F')
+	shl ebx, 4
+
+	sub al, 37h
+	and al, 0Fh
+	or bl, al
+
+	add esi, 1
+
+	sub ecx, 1
+	cmp ecx, 0
+	jne L1
+	jmp SUCCESS
+
+zone3:                  ; ascii 61h ~ 66h ('a' ~ 'f')
+	shl ebx, 4
+
+	sub al, 57h
+	and al, 0Fh
+	or bl, al
+
+	add esi, 1
+
+	sub ecx, 1
+	cmp ecx, 0
+	jne L1
+	jmp SUCCESS
+
+FAIL:
+    stc
+	ret
+SUCCESS:
+    mov eax, ebx
+    clc
+    ret
+
+get_val endp
+
 
 ;-------------------------------------------------------------------------------
 exit_func proc

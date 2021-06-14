@@ -1,186 +1,96 @@
-INCLUDE Irvine32.inc
+TITLE : Septenary to Decimal
+;Write a program that transforms given positive integer (septenary number) (양의 정수)
+;(7 진수) into an decimal number (10 진수). Since we did not learn the input function, you have
+;to declare a specific variable var1 for the septenary number. After calculating decimal number,
+;then insert that in to the EAX. At the end of your code, use DumpRegs function to check
+;the EAX value. The following figure shows you the var1 format. (Other numbers will be used
+;instead of 65 when scoring.)
+
+include Irvine32.inc
 
 .data
-msgMenu BYTE "---- Boolean Calculator ----------",0dh,0ah
-   BYTE "1. x AND y" ,0dh,0ah
-   BYTE "2. x OR y" ,0dh,0ah
-   BYTE "3. NOT x" ,0dh,0ah
-   BYTE "4. x XOR y" ,0dh,0ah
-   BYTE "5. Exit program"
-   BYTE 0dh,0ah,0dh,0ah,0
+	var1 dword 0
 
-msgAND BYTE "Boolean AND",0dh,0ah,0dh,0ah,0
-msgOR BYTE "Boolean OR",0dh,0ah,0dh,0ah,0
-msgNOT BYTE "Boolean NOT",0dh,0ah,0dh,0ah,0
-msgXOR BYTE "Boolean XOR",0dh,0ah,0dh,0ah,0
-
-msgOperand1 BYTE "Input the first 32-bit hexadecimal operand: ",0
-msgOperand2 BYTE "Input the second 32-bit hexadecimal operand: ",0
-msgResult BYTE "The 32-bit hexadecimal result is: ",0
-
-caseTable BYTE '1'                               ;lookup value
-       DWORD _AND_op
-EntrySize = ($ - caseTable)
-   BYTE '2'
-   DWORD _OR_op
-   BYTE '3'
-   DWORD _NOT_op
-   BYTE '4'
-   DWORD _XOR_op
-NumberOfEntries = ($ - caseTable) / EntrySize
+	MAX_BUF_LEN = 10
+	MAX_VALIDINPUT_LEN = 8
 
 .code
-main PROC
+main proc
+retry:
+	mov eax, 0
+	mov ebx, 0
 
-   ; Show menu in a loop
-Menu:
-   mov edx, OFFSET msgMenu
-   call WriteString
+	mov edx, offset var1
+	mov ecx, MAX_BUF_LEN
+	call readstring
+	
+	cmp eax, 8
+	ja retry
+	mov ecx, eax
 
-L1:   
-   call ReadChar ;reads to AL
-   call IsOpt ;checks AL
-   JNZ L1 ;if not opt, try again
+	mov esi, offset var1
 
-   Call ChooseProcedure
-   jc Quit
-   jmp Menu
+L1:
+	mov al, byte ptr [esi]	
+	cmp al, 30h
+	jb retry
+	cmp al, 39h
+	jbe zone1
 
-Quit:
-   exit
-main ENDP
+	cmp al, 41h
+	jb retry
+	cmp al, 46h
+	jbe zone2
 
-;------------------------------------------------
-ChooseProcedure PROC
-;
-; Selects a procedure from the caseTable
-; Receives: AL is the number of operation the user entered
-; Returns: if CF set, exit; else continue
-;------------------------------------------------
-   cmp al, '5'
-   je LQuit
-   mov ebx,OFFSET caseTable
-   mov ecx,NumberOfEntries
-LStart:
-   cmp al,[ebx]
-   jne LNext
-   call NEAR PTR [ebx + TYPE caseTable]       ;in case label size changes
-   jmp LEnd
-LNext:
-   add ebx,EntrySize
-   loop LStart
-LQuit:
-   stc
-LEnd:
-   ret
-ChooseProcedure ENDP
+	cmp al, 61h
+	jb retry
+	cmp al, 66h
+	jbe zone3
 
-;------------------------------------------------
-_AND_op PROC
-;
-; Performs a boolean AND operation
-; Receives: Nothing
-; Returns: Nothing
-;------------------------------------------------
-   mov edx, OFFSET msgAND
-   call PromptHex
-   AND eax, ebx
-   call PrintRes
-   ret
-_AND_op ENDP
+zone1:
+	shl ebx, 4
 
-;------------------------------------------------
-_OR_op PROC
-;
-; Performs a boolean OR operation
-; Receives: Nothing
-; Returns: Nothing
-;------------------------------------------------
-   mov edx, OFFSET msgOR
-   call PromptHex
-   OR eax, ebx
-   call PrintRes
-   ret
+	sub al, 30h
+	and al, 0Fh
+	or bl, al
 
-_OR_op ENDP
+	add esi, 1
 
-;------------------------------------------------
-_NOT_op PROC
-;
-; Performs a boolean NOT operation.
-; Receives: Nothing
-; Returns: Nothing
-;------------------------------------------------
-   mov edx, OFFSET msgNOT
-   call WriteString
-   mov edx, OFFSET msgOperand1
-   call WriteString
-   call ReadHex           ; outputs to eax
-   NOT eax
-   call PrintRes
-   ret
-_NOT_op ENDP
+	sub ecx, 1
+	cmp ecx, 0
+	jne L1
+	jmp THEEND
 
-;------------------------------------------------
-_XOR_op PROC
-;
-; Performs an Exclusive-OR operation
-; Receives: Nothing
-; Returns: Nothing
-;------------------------------------------------
-   mov edx, OFFSET msgXOR
-   call PromptHex
-   XOR eax, ebx
-   call PrintRes
-   ret
-_XOR_op ENDP
+zone2:
+	shl ebx, 4
 
-;-----------------------------------------------
-IsOpt PROC
-;
-; Determines whether the character in AL is
-; a valid menu option character
-; Receives: AL = character
-; Returns: ZF=1 if AL contains a valid decimal
-; digit; otherwise, ZF=0.
-;-----------------------------------------------
-   cmp al,'1'
-   jb ID1
-   cmp al,'5'
-   ja ID1
-   test ax,0        ; set ZF = 1
-ID1: ret
-IsOpt ENDP
+	sub al, 37h
+	and al, 0Fh
+	or bl, al
 
-;-----------------------------------------------
-PromptHex PROC
-;
-; Prompts user to enter two 32bit hex numbers
-; Receives: edx - message name from calling program
-; Return: EBX = first value, EAX = Second value
-;-----------------------------------------------
-   call WriteString
-   mov edx, OFFSET msgOperand1
-   call WriteString
-   call ReadHex           ; outputs to eax
-   mov ebx, eax
-   mov edx, OFFSET msgOperand2
-   call WriteString
-   call ReadHex
-   ret
-PromptHex ENDP
+	add esi, 1
 
-;------------------------------------------------
-PrintRes PROC
-;
-; Receives: eax - Value to print
-; Returns: Sets CF = 1 to signal end of program
-;------------------------------------------------
-   mov edx, OFFSET msgResult
-   call WriteString
-   call WriteHex
-   call CrLf
-   ret
-PrintRes ENDP
+	sub ecx, 1
+	cmp ecx, 0
+	jne L1
+	jmp THEEND
 
-END main;
+zone3:
+	shl ebx, 4
+
+	sub al, 57h
+	and al, 0Fh
+	or bl, al
+
+	add esi, 1
+
+	sub ecx, 1
+	cmp ecx, 0
+	jne L1
+	jmp THEEND
+
+THEEND:
+	exit
+
+main endp
+END main
