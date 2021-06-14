@@ -72,7 +72,7 @@ L_odd:
 	mov even_iter, ebx
 
 	
-;-------------------------------------------------------
+;-------------------------------------------------------------------------------
 L1:
 	call BubbleSort_oddind
 	call BubbleSort_evenind	
@@ -109,11 +109,11 @@ loop2:
 main ENDP
 
 
-;-----------------------------------------------------
+;-------------------------------------------------------------------------------
 ; BubbleSort_oddind - Sort data with odd index. X : ascending, Y : descending
 ; Recieves - ArrData, odd_iter
 ; Returns -  nothing
-;-----------------------------------------------------
+;-------------------------------------------------------------------------------
 BubbleSort_oddind PROC USES eax ecx esi
 	mov ecx, odd_iter
 	dec ecx
@@ -151,11 +151,11 @@ nxt: ; 다음 비교 대상으로 진행
 BubbleSort_oddind ENDP
 
 
-;-----------------------------------------------------
+;-------------------------------------------------------------------------------
 ; BubbleSort_evenind - Sort data with odd index. X : descending, Y : ascending
 ; Recieves - ArrData, even_iter
 ; Returns -  nothing
-;-----------------------------------------------------
+;-------------------------------------------------------------------------------
 BubbleSort_evenind PROC USES eax ecx esi
 	mov ecx, even_iter
 	dec ecx

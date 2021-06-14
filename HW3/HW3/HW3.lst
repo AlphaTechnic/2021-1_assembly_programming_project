@@ -1,13 +1,18 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 03:12:42
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 15:50:13
 Get frequencie						     Page 1 - 1
 
 
 				TITLE Get frequencies
-				;Write a procedure named Get_frequencies that constructs a character frequency table. Input to the
-				;procedure should be a pointer to a string and a pointer to an array of 256 doublewords initialized
-				;to all zeros. Each array position is indexed by its corresponding ASCII code. When the procedure
-				;returns, each entry in the array contains a count of how many times the corresponding character
-				;occurred in the string.
+				;Make a program that functions as a simple Boolean calculator for 32-bit integers. 
+				;It should display a menu that asks the user to make a selection from the following list:
+				;   1. x AND y
+				;   2. x OR y
+				;   3. NOT x
+				;   4. X XOR y
+				;   5. Exit program
+				;When the user makes a choice, call a procedure that displays the name of the operation about
+				;to be performed. You must implement this procedure using the ***Table-Driven Selection***
+				;technique, shown in Section 6.5.4 in textbook.
 
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
@@ -28,119 +33,302 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 03:12:42
 			      C .LIST
 			      C 
 
-				Get_frequencies PROTO,
-				    pString:PTR BYTE,   ; points to string
-				    pTable:PTR DWORD    ; points to frequency table
-
  00000000			.data
- 00000000 41 41 42 42 43	target BYTE "AABBCCDDEEFF", 0
-	   43 44 44 45 45
-	   46 46 00
- 0000000D  00000100 [		freqTable DWORD 256 DUP(0)
+ 00000000 41 41 45 42 44	    target byte "AAEBDCFBBC", 0 ; input data
+	   43 46 42 42 43
+	   00
+ 0000000B  00000100 [		    freqTable DWORD 256 DUP(0)
 	    00000000
 	   ]
 
- 0000040D 53 74 72 69 6E	prompt1 BYTE "String : ", 0
-	   67 20 3A 20 00
- 00000417 49 6E 64 65 78	prompt2 BYTE "Index      FreqTable", 0
-	   20 20 20 20 20
-	   20 46 72 65 71
-	   54 61 62 6C 65
+ 0000040B 31 2E 20 78 20	    prompt_menu byte   "1. x AND y", 0dh, 0ah,
+	   41 4E 44 20 79
+	   0D 0A 32 2E 20
+	   78 20 4F 52 20
+	   79 0D 0A 33 2E
+	   20 4E 4F 54 20
+	   78 0D 0A 34 2E
+	   20 78 20 58 4F
+	   52 20 79 0D 0A
+	   35 2E 20 45 78
+	   69 74 20 50 72
+	   6F 67 72 61 6D
+	   0D 0A 0D 0A 00
+				                   "2. x OR y", 0dh, 0ah,
+				                   "3. NOT x", 0dh, 0ah,
+				                   "4. x XOR y", 0dh, 0ah,
+				                   "5. Exit Program", 0dh, 0ah, 0dh, 0ah, 0
+ 0000044C 43 68 6F 6F 73	    prompt_choose byte "Choose Calculation Mode : ", 0
+	   65 20 43 61 6C
+	   63 75 6C 61 74
+	   69 6F 6E 20 4D
+	   6F 64 65 20 3A
+	   20 00
+ 00000467 44 6F 20 79 6F	    prompt_modechange byte "Do you want to change the mode(Y/N)? : ", 0
+	   75 20 77 61 6E
+	   74 20 74 6F 20
+	   63 68 61 6E 67
+	   65 20 74 68 65
+	   20 6D 6F 64 65
+	   28 59 2F 4E 29
+	   3F 20 3A 20 00
+ 0000048F 45 6E 74 65 72	    prompt_x byte "Enter x : ", 0
+	   20 78 20 3A 20
 	   00
+ 0000049A 45 6E 74 65 72	    prompt_y byte "Enter y : ", 0
+	   20 79 20 3A 20
+	   00
+ 000004A5 52 65 73 75 6C	    prompt_resultAND byte "Result of x AND y : ", 0
+	   74 20 6F 66 20
+	   78 20 41 4E 44
+	   20 79 20 3A 20
+	   00
+ 000004BA 52 65 73 75 6C	    prompt_resultOR byte "Result of x OR y : ", 0
+	   74 20 6F 66 20
+	   78 20 4F 52 20
+	   79 20 3A 20 00
+ 000004CE 52 65 73 75 6C	    prompt_resultNOT byte "Result of NOT x : ", 0
+	   74 20 6F 66 20
+	   4E 4F 54 20 78
+	   20 3A 20 00
+ 000004E1 52 65 73 75 6C	    prompt_resultXOR byte "Result of x XOR y : ", 0
+	   74 20 6F 66 20
+	   78 20 58 4F 52
+	   20 79 20 3A 20
+	   00
+ 000004F6 42 79 65 21 00	    prompt_bye byte "Bye!", 0
+
+ 000004FB 00000001		    CaseTable dword 1
+ 000004FF  000000B8 R		        dword and_func
+ 00000503
+ = 00000008			        EntrySize = $ - CaseTable
+				        
+ 00000503  00000002		        dword 2
+ 00000507  000000EA R		        dword or_func
+ 0000050B  00000003		        dword 3
+ 0000050F  0000011C R		        dword not_func
+ 00000513  00000004		        dword 4
+ 00000517  0000013D R		        dword xor_func
+ 0000051B  00000005		        dword 5
+ 0000051F  0000016F R		        dword exit_func
+ 00000523 = 00000005		    NumberOfEntries = ($ - CaseTable) / EntrySize
+
+ = 00000014			    MAX_BUF_LEN = 20
+ = 00000001			    MAX_VALID_INPUT_LEN = 1
+ 00000523 0000			    answer word 0
+				    
 
  00000000			.code
  00000000			main PROC
- 00000000  E8 0000001B		    call display_string
-				    INVOKE Get_frequencies, ADDR target, ADDR freqTable
- 00000014  E8 00000057		    call DisplayTable
-				    exit
- 00000020			main ENDP
+ 00000000  E8 00000000 E	    call Clrscr
 
+ 00000005			menu :
+ 00000005  E8 00000000 E	    call crlf
+ 0000000A  BA 0000040B R	    mov edx, offset prompt_menu
+ 0000000F  E8 00000000 E	    call writestring
 
- 00000020			display_string proc
- 00000020  E8 00000000 E	    call Clrscr
- 00000025  BA 0000040D R	    mov  edx, offset prompt1
- 0000002A  E8 00000000 E	    call WriteString
- 0000002F  BA 00000000 R	    mov  edx, offset target
- 00000034  E8 00000000 E	    call WriteString
- 00000039  E8 00000000 E	    call crlf
- 0000003E  E8 00000000 E	    call crlf
-
- 00000043  BA 00000417 R	    mov  edx, offset prompt2
- 00000048  E8 00000000 E	    call WriteString
- 0000004D			display_string endp
-
-
-				;-------------------------------------------------------------
- 0000004D			Get_frequencies PROC,
-				    pString:PTR BYTE,   ; points to string
-				    pTable:PTR DWORD    ; points to frequencey table
-				; Recieves : pString, pTable
-				; Returns : freqTable
-				;-------------------------------------------------------------
- 00000050  8B 75 08		    mov esi, pString
- 00000053  8B 7D 0C		    mov edi, pTable
-
- 00000056			L1: 
- 00000056  B8 00000000		    mov eax, 0
- 0000005B  8A 06		    mov al, [esi]
- 0000005D  83 C6 01		    add esi, 1
-
- 00000060  3C 00		    cmp al, 0     ; EOF check
- 00000062  74 08		    je THEEND 
+ 00000014			L1:
+ 00000014  BA 0000044C R	    mov edx, offset prompt_choose
+ 00000019  E8 00000000 E	    call writestring
 				    
- 00000064  C1 E0 02		    shl eax,2        ; multiply by 4
- 00000067  FF 04 07		    inc DWORD PTR [edi + eax]    ; inc table[AL]
- 0000006A  EB EA		    jmp L1       ; repeat loop
+ 0000001E  E8 00000000 E	    call readdec
+ 00000023  E8 00000019		    call validation
+ 00000028  75 EA		    jnz L1
 
- 0000006C			THEEND:
-				    ret
+ 0000002A  50			    push eax ; mode ÀúÀå
 
- 00000070			Get_frequencies ENDP
+ 0000002B			exec_fun:
+ 0000002B  E8 00000025		    call choose_func ; returns selected item number in the al register
+ 00000030  E8 0000003C		    call check_answer;
+ 00000035  72 CE		    jc menu
+
+ 00000037			re_exec:
+ 00000037  58			    pop eax
+ 00000038  EB F1		    jmp exec_fun
+
+				    exit
+ 00000041			main ENDP
 
 
-				;-------------------------------------------------------------
- 00000070			DisplayTable PROC
-				;
-				; Display the non-empty entries of the frequency table.
-				; This procedure was not required, but it makes it easier
-				; to demonstrate that Get_frequencies works.
-				;-------------------------------------------------------------
+				;-------------------------------------------------------------------------------
+ 00000041			validation proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 00000041  83 F8 01		    cmp eax, 1
+ 00000044  72 0E		    jb THEEND
+ 00000046  83 F8 05		    cmp eax, 5
+ 00000049  77 09		    ja THEEND
 
- 0000042C			.data
- 0000042C 20 20 20 20 20	    colonStr BYTE "      ",0
-	   20 00
- 00000070			.code
- 00000070  E8 00000000 E	    call Crlf
- 00000075  B9 00000100		    mov ecx,LENGTHOF freqTable    ; entries to show
- 0000007A  BE 0000000D R	    mov esi,OFFSET freqTable
- 0000007F  BB 00000000		    mov ebx,0 ; index counter
+ 0000004B  E8 00000000 E	    call crlf
+ 00000050  66| A9 0000		    test ax, 0  ; ZF¸¦ setÇÏ¿© ¿ÜºÎ·Î 'Á¤»óÀûÀÎ input'ÀÓÀ» ¾Ë·ÁÁÜ
+ 00000054			THEEND:
+ 00000054  C3			    ret
+ 00000055			validation endp
 
- 00000084			 L1:    
- 00000084  8B 06		    mov eax,[esi]   ; get frequency count
- 00000086  83 F8 00		    cmp eax,0   ; count = 0?
- 00000089  76 1D		    jna L2  ; if so, skip to next entry
 
- 0000008B  8B C3		    mov eax,ebx    ; display the index
- 0000008D  E8 00000000 E	    call Writehex
- 00000092  BA 0000042C R	    mov edx, OFFSET colonStr    ; display ": "
- 00000097  E8 00000000 E	    call WriteString
- 0000009C  8B 06		    mov eax, [esi]  ; show frequency count
- 0000009E  E8 00000000 E	    call WriteDec
- 000000A3  E8 00000000 E	    call Crlf
+				;-------------------------------------------------------------------------------
+ 00000055			choose_func proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 00000055  BE 000004FB R	    mov esi, offset CaseTable
+ 0000005A  B9 00000005		    mov ecx, NumberOfEntries
 
- 000000A8			L2:   
- 000000A8  83 C6 04		    add esi,TYPE freqTable  ; point to next table entry
- 000000AB  43			    inc ebx ; increment index
- 000000AC  E2 D6		    loop L1
+ 0000005F			L1:
+ 0000005F  3B 06		    cmp eax, [esi]
+ 00000061  75 05		    jne nxt
 
- 000000AE  E8 00000000 E	    call Crlf
+ 00000063  FF 56 04		    call near ptr [esi + type CaseTable]
+ 00000066  EB 08		    jmp THEEND
 
- 000000B3  C3			    ret
- 000000B4			    DisplayTable ENDP
+ 00000068			nxt:
+ 00000068  81 C6 00000008	    add esi, EntrySize
+ 0000006E  E2 EF		    loop L1
+
+ 00000070			THEEND:
+ 00000070  C3			    ret
+ 00000071			choose_func endp
+
+
+				;-------------------------------------------------------------------------------
+ 00000071			check_answer proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 00000071  E8 00000000 E	    call crlf
+ 00000076  E8 00000000 E	    call crlf
+ 0000007B			L1:
+ 0000007B  BA 00000467 R	    mov edx, offset prompt_modechange
+ 00000080  E8 00000000 E	    call writestring
+
+ 00000085  BA 00000523 R	    mov edx, offset answer
+ 0000008A  B9 00000014		    mov ecx, MAX_BUF_LEN
+ 0000008F  E8 00000000 E	    call readstring
+				    
+ 00000094  83 F8 01		    cmp eax, MAX_VALID_INPUT_LEN
+ 00000097  75 E2		    jne L1
+
+ 00000099  80 3A 59		    cmp byte ptr [edx], 59h
+ 0000009C  74 11		    je END_y
+ 0000009E  80 3A 79		    cmp byte ptr [edx], 79h
+ 000000A1  74 0C		    je END_y
+ 000000A3  80 3A 4E		    cmp byte ptr [edx], 4Eh
+ 000000A6  74 09		    je END_n
+ 000000A8  80 3A 6E		    cmp byte ptr [edx], 6Eh
+ 000000AB  74 04		    je END_n
+ 000000AD  EB CC		    jmp L1
+
+ 000000AF			END_y:
+ 000000AF  F9			    stc     ; set CF = 1 -> change mode
+ 000000B0  C3			    ret
+ 000000B1			END_n:
+ 000000B1  E8 00000000 E	    call crlf
+ 000000B6  F8			    clc     ; set CF = 0 -> not change mode
+ 000000B7  C3			    ret
+ 000000B8			check_answer endp
+
+
+
+
+				;-------------------------------------------------------------------------------
+ 000000B8			and_func proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 000000B8  BA 0000048F R	    mov edx, offset prompt_x
+ 000000BD  E8 00000000 E	    call writestring
+ 000000C2  E8 00000000 E	    call Readhex
+ 000000C7  8B D8		    mov ebx, eax ; edx : x buffer
+
+ 000000C9  BA 0000049A R	    mov edx, offset prompt_y
+ 000000CE  E8 00000000 E	    call writestring
+ 000000D3  E8 00000000 E	    call Readhex ; eax : y buffer
+
+ 000000D8  BA 000004A5 R	    mov edx, offset prompt_resultAND
+ 000000DD  E8 00000000 E	    call writestring
+				    
+				    ;calculate
+ 000000E2  23 C3		    and eax, ebx;
+ 000000E4  E8 00000000 E	    call writehex
+
+ 000000E9			THEEND:
+ 000000E9  C3			    ret
+
+ 000000EA			and_func endp
+
+				;-------------------------------------------------------------------------------
+ 000000EA			or_func proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 000000EA  BA 0000048F R	    mov edx, offset prompt_x
+ 000000EF  E8 00000000 E	    call writestring
+ 000000F4  E8 00000000 E	    call Readhex
+ 000000F9  8B D8		    mov ebx, eax ; edx : x buffer
+
+ 000000FB  BA 0000049A R	    mov edx, offset prompt_y
+ 00000100  E8 00000000 E	    call writestring
+ 00000105  E8 00000000 E	    call Readhex ; eax : y buffer
+
+ 0000010A  BA 000004A5 R	    mov edx, offset prompt_resultAND
+ 0000010F  E8 00000000 E	    call writestring
+				    
+				    ;calculate
+ 00000114  0B C3		    or eax, ebx;
+ 00000116  E8 00000000 E	    call writehex
+
+ 0000011B			THEEND:
+ 0000011B  C3			    ret
+ 0000011C			or_func endp
+
+				;-------------------------------------------------------------------------------
+ 0000011C			not_func proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 0000011C  BA 0000048F R	    mov edx, offset prompt_x
+ 00000121  E8 00000000 E	    call writestring
+ 00000126  E8 00000000 E	    call Readhex
+
+ 0000012B  BA 000004CE R	    mov edx, offset prompt_resultNOT
+ 00000130  E8 00000000 E	    call writestring
+
+				    ;calculate
+ 00000135  F7 D0		    not eax;
+ 00000137  E8 00000000 E	    call writehex
+
+ 0000013C			THEEND:
+ 0000013C  C3			    ret
+ 0000013D			not_func endp
+
+				;-------------------------------------------------------------------------------
+ 0000013D			xor_func proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+ 0000013D  BA 0000048F R	    mov edx, offset prompt_x
+ 00000142  E8 00000000 E	    call writestring
+ 00000147  E8 00000000 E	    call Readhex
+ 0000014C  8B D8		    mov ebx, eax ; edx : x buffer
+
+ 0000014E  BA 0000049A R	    mov edx, offset prompt_y
+ 00000153  E8 00000000 E	    call writestring
+ 00000158  E8 00000000 E	    call Readhex ; eax : y buffer
+
+ 0000015D  BA 000004A5 R	    mov edx, offset prompt_resultAND
+ 00000162  E8 00000000 E	    call writestring
+				    
+				    ;calculate
+ 00000167  33 C3		    xor eax, ebx;
+ 00000169  E8 00000000 E	    call writehex
+
+ 0000016E			THEEND:
+ 0000016E  C3			    ret
+ 0000016F			xor_func endp
+
+				;-------------------------------------------------------------------------------
+ 0000016F			exit_func proc
+				; Display the string input by data segment.
+				;-------------------------------------------------------------------------------
+				    exit
+ 00000176			exit_func endp
 
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 03:12:42
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/14/21 15:50:13
 Get frequencie						     Symbols 2 - 1
 
 
@@ -234,8 +422,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000433 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000000B4 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000525 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000176 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -249,9 +437,6 @@ CreateFileA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 CreateOutputFile . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Crlf . . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Delay  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-DisplayTable . . . . . . . . . .	P Near	 00000070 _TEXT	Length= 00000044 Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 00000084 _TEXT	
-  L2 . . . . . . . . . . . . . .	L Near	 000000A8 _TEXT	
 DumpMem  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ExitProcess  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -278,11 +463,6 @@ GetStdHandle . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 GetSystemTime  . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetTextColor . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetTickCount . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Get_frequencies  . . . . . . . .	P Near	 0000004D _TEXT	Length= 00000023 Public STDCALL
-  pString  . . . . . . . . . . .	DWord	 bp + 00000008
-  pTable . . . . . . . . . . . .	DWord	 bp + 0000000C
-  L1 . . . . . . . . . . . . . .	L Near	 00000056 _TEXT	
-  THEEND . . . . . . . . . . . .	L Near	 0000006C _TEXT	
 Gotoxy . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapAlloc  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -350,11 +530,33 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-display_string . . . . . . . . .	P Near	 00000020 _TEXT	Length= 0000002D Public STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000020 Public STDCALL
+and_func . . . . . . . . . . . .	P Near	 000000B8 _TEXT	Length= 00000032 Public STDCALL
+  THEEND . . . . . . . . . . . .	L Near	 000000E9 _TEXT	
+check_answer . . . . . . . . . .	P Near	 00000071 _TEXT	Length= 00000047 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 0000007B _TEXT	
+  END_y  . . . . . . . . . . . .	L Near	 000000AF _TEXT	
+  END_n  . . . . . . . . . . . .	L Near	 000000B1 _TEXT	
+choose_func  . . . . . . . . . .	P Near	 00000055 _TEXT	Length= 0000001C Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 0000005F _TEXT	
+  nxt  . . . . . . . . . . . . .	L Near	 00000068 _TEXT	
+  THEEND . . . . . . . . . . . .	L Near	 00000070 _TEXT	
+exit_func  . . . . . . . . . . .	P Near	 0000016F _TEXT	Length= 00000007 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000041 Public STDCALL
+  menu . . . . . . . . . . . . .	L Near	 00000005 _TEXT	
+  L1 . . . . . . . . . . . . . .	L Near	 00000014 _TEXT	
+  exec_fun . . . . . . . . . . .	L Near	 0000002B _TEXT	
+  re_exec  . . . . . . . . . . .	L Near	 00000037 _TEXT	
+not_func . . . . . . . . . . . .	P Near	 0000011C _TEXT	Length= 00000021 Public STDCALL
+  THEEND . . . . . . . . . . . .	L Near	 0000013C _TEXT	
+or_func  . . . . . . . . . . . .	P Near	 000000EA _TEXT	Length= 00000032 Public STDCALL
+  THEEND . . . . . . . . . . . .	L Near	 0000011B _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
+validation . . . . . . . . . . .	P Near	 00000041 _TEXT	Length= 00000014 Public STDCALL
+  THEEND . . . . . . . . . . . .	L Near	 00000054 _TEXT	
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
+xor_func . . . . . . . . . . . .	P Near	 0000013D _TEXT	Length= 00000032 Public STDCALL
+  THEEND . . . . . . . . . . . .	L Near	 0000016E _TEXT	
 
 
 Symbols:
@@ -375,6 +577,7 @@ CAPSLOCK_ON  . . . . . . . . . .	Number	 00000080h
 CREATE_ALWAYS  . . . . . . . . .	Number	 00000002h   
 CREATE_NEW . . . . . . . . . . .	Number	 00000001h   
 CTRL_MASK  . . . . . . . . . . .	Number	 0000000Ch   
+CaseTable  . . . . . . . . . . .	DWord	 000004FB _DATA	
 CreateFile . . . . . . . . . . .	Text   	 CreateFileA
 DO_NOT_SHARE . . . . . . . . . .	Number	 00000000h   
 ENABLE_ECHO_INPUT  . . . . . . .	Number	 00000004h   
@@ -385,6 +588,7 @@ ENABLE_PROCESSED_OUTPUT  . . . .	Number	 00000001h
 ENABLE_WINDOW_INPUT  . . . . . .	Number	 00000008h   
 ENABLE_WRAP_AT_EOL_OUTPUT  . . .	Number	 00000002h   
 ENHANCED_KEY . . . . . . . . . .	Number	 00000100h   
+EntrySize  . . . . . . . . . . .	Number	 00000008h   
 FALSE  . . . . . . . . . . . . .	Number	 00000000h   
 FILE_APPEND_DATA . . . . . . . .	Number	 00000004h   
 FILE_ATTRIBUTE_ARCHIVE . . . . .	Number	 00000020h   
@@ -443,6 +647,8 @@ KEY_EVENT  . . . . . . . . . . .	Number	 00000001h
 KEY_MASKS  . . . . . . . . . . .	Number	 0000001Fh   
 LEFT_ALT_PRESSED . . . . . . . .	Number	 00000002h   
 LEFT_CTRL_PRESSED  . . . . . . .	Number	 00000008h   
+MAX_BUF_LEN  . . . . . . . . . .	Number	 00000014h   
+MAX_VALID_INPUT_LEN  . . . . . .	Number	 00000001h   
 MB_ABORTRETRYIGNORE  . . . . . .	Number	 00000002h   
 MB_APPLMODAL . . . . . . . . . .	Number	 00000000h   
 MB_CANCELTRYCONTINUE . . . . . .	Number	 00000006h   
@@ -472,6 +678,7 @@ MOUSE_EVENT  . . . . . . . . . .	Number	 00000002h
 MessageBox . . . . . . . . . . .	Text   	 MessageBoxA
 NULL . . . . . . . . . . . . . .	Number	 00000000h   
 NUMLOCK_ON . . . . . . . . . . .	Number	 00000020h   
+NumberOfEntries  . . . . . . . .	Number	 00000005h   
 OPEN_ALWAYS  . . . . . . . . . .	Number	 00000004h   
 OPEN_EXISTING  . . . . . . . . .	Number	 00000003h   
 PeekConsoleInput . . . . . . . .	Text   	 PeekConsoleInputA
@@ -570,13 +777,13 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
+answer . . . . . . . . . . . . .	Word	 00000523 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-colonStr . . . . . . . . . . . .	Byte	 0000042C _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
-freqTable  . . . . . . . . . . .	DWord	 0000000D _DATA	
+freqTable  . . . . . . . . . . .	DWord	 0000000B _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
@@ -586,8 +793,16 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-prompt1  . . . . . . . . . . . .	Byte	 0000040D _DATA	
-prompt2  . . . . . . . . . . . .	Byte	 00000417 _DATA	
+prompt_bye . . . . . . . . . . .	Byte	 000004F6 _DATA	
+prompt_choose  . . . . . . . . .	Byte	 0000044C _DATA	
+prompt_menu  . . . . . . . . . .	Byte	 0000040B _DATA	
+prompt_modechange  . . . . . . .	Byte	 00000467 _DATA	
+prompt_resultAND . . . . . . . .	Byte	 000004A5 _DATA	
+prompt_resultNOT . . . . . . . .	Byte	 000004CE _DATA	
+prompt_resultOR  . . . . . . . .	Byte	 000004BA _DATA	
+prompt_resultXOR . . . . . . . .	Byte	 000004E1 _DATA	
+prompt_x . . . . . . . . . . . .	Byte	 0000048F _DATA	
+prompt_y . . . . . . . . . . . .	Byte	 0000049A _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 target . . . . . . . . . . . . .	Byte	 00000000 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   

@@ -8,26 +8,32 @@ TITLE Get frequencies
 INCLUDE Irvine32.inc
 
 Get_frequencies PROTO,
-    pString:PTR BYTE,   ; points to string
-    pTable:PTR DWORD    ; points to frequency table
+    pString:ptr byte,   
+    pTable:ptr dword 
 
 .data
-target BYTE "AABBCCDDEEFF", 0
-freqTable DWORD 256 DUP(0)
+    target byte "AAEBDCFBBC", 0 ; input data
+    freqTable DWORD 256 DUP(0)
 
-prompt1 BYTE "String : ", 0
-prompt2 BYTE "Index      FreqTable", 0
+    prompt1 byte "String : ", 0
+    prompt2 byte "Index      FreqTable", 0
+    space byte "      ", 0
 
 .code
 main PROC
     call display_string
+
     INVOKE Get_frequencies, ADDR target, ADDR freqTable
-    call DisplayTable
+    
+    call display_table
     exit
 main ENDP
 
 
+;-------------------------------------------------------------------------------
 display_string proc
+; Display the string input by data segment.
+;-------------------------------------------------------------------------------
     call Clrscr
     mov  edx, offset prompt1
     call WriteString
@@ -41,13 +47,13 @@ display_string proc
 display_string endp
 
 
-;-------------------------------------------------------------
+;-------------------------------------------------------------------------------
 Get_frequencies PROC,
-    pString:PTR BYTE,   ; points to string
-    pTable:PTR DWORD    ; points to frequencey table
-; Recieves : pString, pTable
-; Returns : freqTable
-;-------------------------------------------------------------
+    pString:ptr byte,   ; parameter string
+    pTable:ptr dword    ; parameter table
+; Recieves - pString, pTable
+; Returns - freqTable
+;-------------------------------------------------------------------------------
     mov esi, pString
     mov edi, pTable
 
@@ -59,9 +65,11 @@ L1:
     cmp al, 0     ; EOF check
     je THEEND 
     
-    shl eax,2        ; multiply by 4
-    inc DWORD PTR [edi + eax]    ; inc table[AL]
-    jmp L1       ; repeat loop
+    ; 4를 곱한다. 4byte 공간에 index에 해당하는 frequencies를 저장하기 위함 
+    shl eax, 2        
+    ; 해당 index의 count를 1 올린다.
+    inc DWORD PTR [edi + eax]
+    jmp L1
 
 THEEND:
     ret
@@ -69,43 +77,37 @@ THEEND:
 Get_frequencies ENDP
 
 
-;-------------------------------------------------------------
-DisplayTable PROC
+;-------------------------------------------------------------------------------
+display_table PROC
 ;
 ; Display the non-empty entries of the frequency table.
-; This procedure was not required, but it makes it easier
-; to demonstrate that Get_frequencies works.
-;-------------------------------------------------------------
-
-.data
-    colonStr BYTE "      ",0
-.code
+;-------------------------------------------------------------------------------
     call Crlf
-    mov ecx,LENGTHOF freqTable    ; entries to show
-    mov esi,OFFSET freqTable
-    mov ebx,0 ; index counter
+    mov ecx, length freqTable    
+    mov esi, offset freqTable
+    mov ebx, 0 ; ASCII == 0 부터 탐색
 
  L1:    
-    mov eax,[esi]   ; get frequency count
-    cmp eax,0   ; count = 0?
-    jna L2  ; if so, skip to next entry
+    mov eax, [esi]
+    cmp eax, 0
+    jz NXT               ; freq 0인 부분은 skip
 
-    mov eax,ebx    ; display the index
+    mov eax, ebx    
     call Writehex
-    mov edx, OFFSET colonStr    ; display ": "
+    mov edx, OFFSET space
     call WriteString
     mov eax, [esi]  ; show frequency count
     call WriteDec
     call Crlf
 
-L2:   
-    add esi,TYPE freqTable  ; point to next table entry
-    inc ebx ; increment index
+NXT:   
+    add esi, type freqTable
+    add ebx, 1
     loop L1
 
     call Crlf
 
     ret
-    DisplayTable ENDP
+display_table ENDP
 
 END main
