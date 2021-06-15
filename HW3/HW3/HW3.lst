@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 12:36:05
 Get frequencie						     Page 1 - 1
 
 
@@ -34,14 +34,7 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 			      C 
 
  00000000			.data
- 00000000 41 41 45 42 44	    target byte "AAEBDCFBBC", 0 ; input data
-	   43 46 42 42 43
-	   00
- 0000000B  00000100 [		    freqTable DWORD 256 DUP(0)
-	    00000000
-	   ]
-
- 0000040B 31 2E 20 78 20	    prompt_menu byte   "1. x AND y", 0dh, 0ah,
+ 00000000 31 2E 20 78 20	    prompt_menu byte   "1. x AND y", 0dh, 0ah,
 	   41 4E 44 20 79
 	   0D 0A 32 2E 20
 	   78 20 4F 52 20
@@ -58,13 +51,13 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 				                   "3. NOT x", 0dh, 0ah,
 				                   "4. x XOR y", 0dh, 0ah,
 				                   "5. Exit Program", 0dh, 0ah, 0dh, 0ah, 0
- 0000044C 43 68 6F 6F 73	    prompt_choose byte "Choose Calculation Mode : ", 0
+ 00000041 43 68 6F 6F 73	    prompt_choose byte "Choose Calculation Mode : ", 0
 	   65 20 43 61 6C
 	   63 75 6C 61 74
 	   69 6F 6E 20 4D
 	   6F 64 65 20 3A
 	   20 00
- 00000467 44 6F 20 79 6F	    prompt_modechange byte "Do you want to change the mode(Y/N)? : ", 0
+ 0000005C 44 6F 20 79 6F	    prompt_modechange byte "Do you want to change the mode(Y/N)? : ", 0
 	   75 20 77 61 6E
 	   74 20 74 6F 20
 	   63 68 61 6E 67
@@ -72,54 +65,54 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 	   20 6D 6F 64 65
 	   28 59 2F 4E 29
 	   3F 20 3A 20 00
- 0000048F 45 6E 74 65 72	    prompt_x byte "Enter x : ", 0
+ 00000084 45 6E 74 65 72	    prompt_x byte "Enter x : ", 0
 	   20 78 20 3A 20
 	   00
- 0000049A 45 6E 74 65 72	    prompt_y byte "Enter y : ", 0
+ 0000008F 45 6E 74 65 72	    prompt_y byte "Enter y : ", 0
 	   20 79 20 3A 20
 	   00
- 000004A5 52 65 73 75 6C	    prompt_resultAND byte "Result of x AND y : ", 0
+ 0000009A 52 65 73 75 6C	    prompt_resultAND byte "Result of x AND y : ", 0
 	   74 20 6F 66 20
 	   78 20 41 4E 44
 	   20 79 20 3A 20
 	   00
- 000004BA 52 65 73 75 6C	    prompt_resultOR byte "Result of x OR y : ", 0
+ 000000AF 52 65 73 75 6C	    prompt_resultOR byte "Result of x OR y : ", 0
 	   74 20 6F 66 20
 	   78 20 4F 52 20
 	   79 20 3A 20 00
- 000004CE 52 65 73 75 6C	    prompt_resultNOT byte "Result of NOT x : ", 0
+ 000000C3 52 65 73 75 6C	    prompt_resultNOT byte "Result of NOT x : ", 0
 	   74 20 6F 66 20
 	   4E 4F 54 20 78
 	   20 3A 20 00
- 000004E1 52 65 73 75 6C	    prompt_resultXOR byte "Result of x XOR y : ", 0
+ 000000D6 52 65 73 75 6C	    prompt_resultXOR byte "Result of x XOR y : ", 0
 	   74 20 6F 66 20
 	   78 20 58 4F 52
 	   20 79 20 3A 20
 	   00
- 000004F6 42 79 65 21 00	    prompt_bye byte "Bye!", 0
+ 000000EB 42 79 65 21 00	    prompt_bye byte "Bye!", 0
 
- 000004FB 00000001		    CaseTable dword 1
- 000004FF  000000B8 R		        dword and_func
- 00000503
+ 000000F0 00000001		    CaseTable dword 1
+ 000000F4  000000B8 R		        dword and_func
+ 000000F8
  = 00000008			        EntrySize = $ - CaseTable
 				        
- 00000503  00000002		        dword 2
- 00000507  000000EE R		        dword or_func
- 0000050B  00000003		        dword 3
- 0000050F  00000124 R		        dword not_func
- 00000513  00000004		        dword 4
- 00000517  00000149 R		        dword xor_func
- 0000051B  00000005		        dword 5
- 0000051F  00000210 R		        dword exit_func
- 00000523 = 00000005		    NumberOfEntries = ($ - CaseTable) / EntrySize
+ 000000F8  00000002		        dword 2
+ 000000FC  000000EE R		        dword or_func
+ 00000100  00000003		        dword 3
+ 00000104  00000124 R		        dword not_func
+ 00000108  00000004		        dword 4
+ 0000010C  00000149 R		        dword xor_func
+ 00000110  00000005		        dword 5
+ 00000114  00000210 R		        dword exit_func
+ 00000118 = 00000005		    NumberOfEntries = ($ - CaseTable) / EntrySize
 				    
  = 0000000A			    YN_MAX_BUF_LEN = 10         ; Y / N answer buf
  = 00000001			    YN_MAX_VALID_INPUT_LEN = 1
- 00000523 0000			    answer word 0
+ 00000118 0000			    answer word 0
 
- = 0000000A			    STRING_MAX_BUF_LEN = 10            ; 
+ = 0000000A			    STRING_MAX_BUF_LEN = 10     ; input string buf
  = 00000008				STRING_MAX_VALID_INPUT_LEN = 8
- 00000525 00000000		    enter_val dword 0
+ 0000011A 00000000		    enter_val dword 0
 				    
 
  00000000			.code
@@ -128,22 +121,22 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 
  00000005			menu :
  00000005  E8 00000000 E	    call crlf
- 0000000A  BA 0000040B R	    mov edx, offset prompt_menu
+ 0000000A  BA 00000000 R	    mov edx, offset prompt_menu
  0000000F  E8 00000000 E	    call writestring
 
  00000014			L1:
- 00000014  BA 0000044C R	    mov edx, offset prompt_choose
+ 00000014  BA 00000041 R	    mov edx, offset prompt_choose
  00000019  E8 00000000 E	    call writestring
 				    
  0000001E  E8 00000000 E	    call readdec
- 00000023  E8 00000019		    call validation
+ 00000023  E8 00000019		    call validate_menu_choice
  00000028  75 EA		    jnz L1
 
- 0000002A  50			    push eax ; mode ÀúÀå
+ 0000002A  50			    push eax                ; mode ÀúÀå
 
  0000002B			exec_fun:
- 0000002B  E8 00000025		    call choose_func ; returns selected item number in the al register
- 00000030  E8 0000003C		    call check_answer;
+ 0000002B  E8 00000025		    call choose_func        ; returns selected func in the eax register
+ 00000030  E8 0000003C		    call validate_yn_choice;
  00000035  72 CE		    jc menu
 
  00000037			re_exec:
@@ -155,8 +148,10 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 
 
 				;-------------------------------------------------------------------------------
- 00000041			validation proc
+ 00000041			validate_menu_choice proc
 				; Display the string input by data segment.
+				; Recieves - nothing
+				; Returns -  ZF (0 -> Á¤»óÀûÀÎ ÀÔ·Â)
 				;-------------------------------------------------------------------------------
  00000041  83 F8 01		    cmp eax, 1
  00000044  72 0E		    jb THEEND
@@ -167,14 +162,16 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  00000050  66| A9 0000		    test ax, 0  ; ZF¸¦ setÇÏ¿© ¿ÜºÎ·Î 'Á¤»óÀûÀÎ input'ÀÓÀ» ¾Ë·ÁÁÜ
  00000054			THEEND:
  00000054  C3			    ret
- 00000055			validation endp
+ 00000055			validate_menu_choice endp
 
 
 				;-------------------------------------------------------------------------------
  00000055			choose_func proc
-				; Display the string input by data segment.
+				; »ç¿ëÀÚÀÔ·Â¿¡ ¸Â´Â functionÀ» Case table¿¡¼­ searchÇÏ¿© eax ·¹Áö½ºÅÍ¿¡ ¾Ë·ÁÁØ´Ù.
+				; Recieves - CaseTable, NumberOfEntries
+				; Returns -  eax (¼±ÅÃµÈ ÇÔ¼öcode blockÀÇ ÁÖ¼Ò)
 				;-------------------------------------------------------------------------------
- 00000055  BE 000004FB R	    mov esi, offset CaseTable
+ 00000055  BE 000000F0 R	    mov esi, offset CaseTable
  0000005A  B9 00000005		    mov ecx, NumberOfEntries
 
  0000005F			L1:
@@ -194,22 +191,25 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 
 
 				;-------------------------------------------------------------------------------
- 00000071			check_answer proc
-				; Display the string input by data segment.
+ 00000071			validate_yn_choice proc
+				; »ç¿ëÀÚ·ÎºÎÅÍ y or n¸¦ ÀÔ·Â ¹Þ°í, ÀÌ¿¡´ëÇÑ À¯È¿¼ºÀ» °Ë»çÇÑ´Ù.
+				; Recieves - nothing
+				; Returns -  CF (1 -> yes, 0 -> no)
 				;-------------------------------------------------------------------------------
  00000071  E8 00000000 E	    call crlf
  00000076  E8 00000000 E	    call crlf
  0000007B			L1:
- 0000007B  BA 00000467 R	    mov edx, offset prompt_modechange
+ 0000007B  BA 0000005C R	    mov edx, offset prompt_modechange
  00000080  E8 00000000 E	    call writestring
 
- 00000085  BA 00000523 R	    mov edx, offset answer
+ 00000085  BA 00000118 R	    mov edx, offset answer
  0000008A  B9 0000000A		    mov ecx, YN_MAX_BUF_LEN
  0000008F  E8 00000000 E	    call readstring
 				    
  00000094  83 F8 01		    cmp eax, YN_MAX_VALID_INPUT_LEN
  00000097  75 E2		    jne L1
 
+				    ; 'Y', 'y', 'N', 'n'¸¸ À¯È¿ÇÑ ÀÔ·ÂÀ¸·Î detect
  00000099  80 3A 59		    cmp byte ptr [edx], 59h
  0000009C  74 11		    je END_y
  0000009E  80 3A 79		    cmp byte ptr [edx], 79h
@@ -227,17 +227,17 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  000000B1  E8 00000000 E	    call crlf
  000000B6  F8			    clc     ; set CF = 0 -> not change mode
  000000B7  C3			    ret
- 000000B8			check_answer endp
-
-
+ 000000B8			validate_yn_choice endp
 
 
 				;-------------------------------------------------------------------------------
  000000B8			and_func proc
-				; Display the string input by data segment.
+				; »ç¿ëÀÚ·ÎºÎÅÍ 2°³ÀÇ hex value¸¦ ÀÔ·Â¹Þ°í, AND ¿¬»ê ¼öÇà
+				; Recieves - nothing
+				; Returns -  eax(¿¬»ê °á°ú)
 				;-------------------------------------------------------------------------------
  000000B8			enter_x:
- 000000B8  BA 0000048F R	    mov edx, offset prompt_x
+ 000000B8  BA 00000084 R	    mov edx, offset prompt_x
  000000BD  E8 00000000 E	    call writestring
 				    
  000000C2  E8 000000B8		    call get_val
@@ -245,13 +245,13 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  000000C9  8B D8		    mov ebx, eax        ; edx : x buffer
 
  000000CB			enter_y:
- 000000CB  BA 0000049A R	    mov edx, offset prompt_y
+ 000000CB  BA 0000008F R	    mov edx, offset prompt_y
  000000D0  E8 00000000 E	    call writestring
 				   
  000000D5  E8 000000A5		    call get_val
  000000DA  72 EF		    jc enter_y          ; eax : x buffer
 
- 000000DC  BA 000004A5 R	    mov edx, offset prompt_resultAND
+ 000000DC  BA 0000009A R	    mov edx, offset prompt_resultAND
  000000E1  E8 00000000 E	    call writestring
 				    
 				    ;calculate
@@ -263,12 +263,15 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 
  000000EE			and_func endp
 
+
 				;-------------------------------------------------------------------------------
  000000EE			or_func proc
-				; Display the string input by data segment.
+				; »ç¿ëÀÚ·ÎºÎÅÍ 2°³ÀÇ hex value¸¦ ÀÔ·Â¹Þ°í, OR ¿¬»ê ¼öÇà
+				; Recieves - nothing
+				; Returns -  eax(¿¬»ê °á°ú)
 				;-------------------------------------------------------------------------------
  000000EE			 enter_x:
- 000000EE  BA 0000048F R	    mov edx, offset prompt_x
+ 000000EE  BA 00000084 R	    mov edx, offset prompt_x
  000000F3  E8 00000000 E	    call writestring
 				    
  000000F8  E8 00000082		    call get_val
@@ -276,13 +279,13 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  000000FF  8B D8		    mov ebx, eax        ; ebx : x buffer
 
  00000101			enter_y:
- 00000101  BA 0000049A R	    mov edx, offset prompt_y
+ 00000101  BA 0000008F R	    mov edx, offset prompt_y
  00000106  E8 00000000 E	    call writestring
 				   
  0000010B  E8 0000006F		    call get_val
  00000110  72 EF		    jc enter_y          ; eax : x buffer
 
- 00000112  BA 000004A5 R	    mov edx, offset prompt_resultAND
+ 00000112  BA 0000009A R	    mov edx, offset prompt_resultAND
  00000117  E8 00000000 E	    call writestring
 				    
 				    ;calculate
@@ -293,19 +296,22 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  00000123  C3			    ret
  00000124			or_func endp
 
+
 				;-------------------------------------------------------------------------------
  00000124			not_func proc
-				; Display the string input by data segment.
+				; »ç¿ëÀÚ·ÎºÎÅÍ 1°³ÀÇ hex value¸¦ ÀÔ·Â¹Þ°í, NOT ¿¬»ê ¼öÇà
+				; Recieves - nothing
+				; Returns -  eax(¿¬»ê °á°ú)
 				;-------------------------------------------------------------------------------
  00000124			 enter_x:
- 00000124  BA 0000048F R	    mov edx, offset prompt_x
+ 00000124  BA 00000084 R	    mov edx, offset prompt_x
  00000129  E8 00000000 E	    call writestring
 				    
  0000012E  E8 0000004C		    call get_val
  00000133  72 EF		    jc enter_x
  00000135  8B D8		    mov ebx, eax        ; ebx : x buffer
 
- 00000137  BA 000004CE R	    mov edx, offset prompt_resultNOT
+ 00000137  BA 000000C3 R	    mov edx, offset prompt_resultNOT
  0000013C  E8 00000000 E	    call writestring
 
 				    ;calculate
@@ -316,12 +322,15 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  00000148  C3			    ret
  00000149			not_func endp
 
+
 				;-------------------------------------------------------------------------------
  00000149			xor_func proc
-				; Display the string input by data segment.
+				; »ç¿ëÀÚ·ÎºÎÅÍ 2°³ÀÇ hex value¸¦ ÀÔ·Â¹Þ°í, XOR ¿¬»ê ¼öÇà
+				; Recieves - nothing
+				; Returns -  eax(¿¬»ê °á°ú)
 				;-------------------------------------------------------------------------------
  00000149			 enter_x:
- 00000149  BA 0000048F R	    mov edx, offset prompt_x
+ 00000149  BA 00000084 R	    mov edx, offset prompt_x
  0000014E  E8 00000000 E	    call writestring
 				    
  00000153  E8 00000027		    call get_val
@@ -329,13 +338,13 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  0000015A  8B D8		    mov ebx, eax        ; ebx : x buffer
 
  0000015C			enter_y:
- 0000015C  BA 0000049A R	    mov edx, offset prompt_y
+ 0000015C  BA 0000008F R	    mov edx, offset prompt_y
  00000161  E8 00000000 E	    call writestring
 				   
  00000166  E8 00000014		    call get_val
  0000016B  72 EF		    jc enter_y          ; eax : x buffer
 
- 0000016D  BA 000004E1 R	    mov edx, offset prompt_resultXOR
+ 0000016D  BA 000000D6 R	    mov edx, offset prompt_resultXOR
  00000172  E8 00000000 E	    call writestring
 				    
 				    ;calculate
@@ -347,26 +356,27 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  0000017F			xor_func endp
 
 
-
 				;-------------------------------------------------------------------------------
  0000017F			get_val proc uses ebx
-				; Display the string input by data segment.
+				; »ç¿ëÀÚ·ÎºÎÅÍ hex value¸¦ ÀÔ·Â¹Þ°í, ÀÌ¿¡ ´ëÇÑ À¯È¿¼ºÀ» °Ë»çÇÏ´Â ÇÔ¼ö
+				; Recieves - nothing
+				; Returns -  CF(0 -> À¯È¿ÇÏÁö ¾Ê´Ù, 1 -> À¯È¿ÇÏ´Ù)
 				;-------------------------------------------------------------------------------
  00000180			B:
  00000180  B8 00000000			mov eax, 0
  00000185  BB 00000000			mov ebx, 0
 
- 0000018A  BA 00000525 R		mov edx, offset enter_val
+ 0000018A  BA 0000011A R		mov edx, offset enter_val
  0000018F  B9 0000000A			mov ecx, STRING_MAX_BUF_LEN
  00000194  E8 00000000 E		call readstring
 					
- 00000199  83 F8 08			cmp eax, STRING_MAX_VALID_INPUT_LEN  ;STRING_MAX_VALID_INPUT_LEN = 8
+ 00000199  83 F8 08			cmp eax, STRING_MAX_VALID_INPUT_LEN     ;STRING_MAX_VALID_INPUT_LEN = 8
  0000019C  77 6A			ja FAIL
  0000019E  83 F8 00		    cmp eax, 0
  000001A1  74 65		    je FAIL
  000001A3  8B C8			mov ecx, eax
 
- 000001A5  BE 00000525 R		mov esi, offset enter_val
+ 000001A5  BE 0000011A R		mov esi, offset enter_val
 
  000001AA			L1:
  000001AA  8A 06			mov al, byte ptr [esi]	
@@ -387,7 +397,7 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 				    
  000001C4  EB 42		    jmp FAIL 
 
- 000001C6			zone1:
+ 000001C6			zone1:                  ; ascii 30h ~ 39h ('0' ~ '9')
  000001C6  C1 E3 04			shl ebx, 4
 
  000001C9  2C 30			sub al, 30h
@@ -401,8 +411,8 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  000001D8  75 D0			jne L1
  000001DA  EB 2F			jmp SUCCESS
 
- 000001DC			zone2:
- 000001DC  C1 E3 04			shl ebx, 4
+ 000001DC			zone2:                  ; ascii 41h ~ 46h ('A' ~ 'F')
+ 000001DC  C1 E3 04			shl ebx, 4  
 
  000001DF  2C 37			sub al, 37h
  000001E1  24 0F			and al, 0Fh
@@ -415,7 +425,7 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
  000001EE  75 BA			jne L1
  000001F0  EB 19			jmp SUCCESS
 
- 000001F2			zone3:
+ 000001F2			zone3:                  ; ascii 61h ~ 66h ('a' ~ 'f')
  000001F2  C1 E3 04			shl ebx, 4
 
  000001F5  2C 57			sub al, 57h
@@ -442,13 +452,13 @@ Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
 
 				;-------------------------------------------------------------------------------
  00000210			exit_func proc
-				; Display the string input by data segment.
+				; terminate the program
 				;-------------------------------------------------------------------------------
 				    exit
  00000217			exit_func endp
 
 				END main
-Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 03:15:02
+Microsoft (R) Macro Assembler Version 14.28.29335.0	    06/15/21 12:36:05
 Get frequencie						     Symbols 2 - 1
 
 
@@ -542,7 +552,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000529 Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000011E Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 00000217 Para	  Public  'CODE'	
 
 
@@ -654,10 +664,6 @@ and_func . . . . . . . . . . . .	P Near	 000000B8 _TEXT	Length= 00000036 Public 
   enter_x  . . . . . . . . . . .	L Near	 000000B8 _TEXT	
   enter_y  . . . . . . . . . . .	L Near	 000000CB _TEXT	
   THEEND . . . . . . . . . . . .	L Near	 000000ED _TEXT	
-check_answer . . . . . . . . . .	P Near	 00000071 _TEXT	Length= 00000047 Public STDCALL
-  L1 . . . . . . . . . . . . . .	L Near	 0000007B _TEXT	
-  END_y  . . . . . . . . . . . .	L Near	 000000AF _TEXT	
-  END_n  . . . . . . . . . . . .	L Near	 000000B1 _TEXT	
 choose_func  . . . . . . . . . .	P Near	 00000055 _TEXT	Length= 0000001C Public STDCALL
   L1 . . . . . . . . . . . . . .	L Near	 0000005F _TEXT	
   nxt  . . . . . . . . . . . . .	L Near	 00000068 _TEXT	
@@ -685,8 +691,12 @@ or_func  . . . . . . . . . . . .	P Near	 000000EE _TEXT	Length= 00000036 Public 
   THEEND . . . . . . . . . . . .	L Near	 00000123 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-validation . . . . . . . . . . .	P Near	 00000041 _TEXT	Length= 00000014 Public STDCALL
+validate_menu_choice . . . . . .	P Near	 00000041 _TEXT	Length= 00000014 Public STDCALL
   THEEND . . . . . . . . . . . .	L Near	 00000054 _TEXT	
+validate_yn_choice . . . . . . .	P Near	 00000071 _TEXT	Length= 00000047 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 0000007B _TEXT	
+  END_y  . . . . . . . . . . . .	L Near	 000000AF _TEXT	
+  END_n  . . . . . . . . . . . .	L Near	 000000B1 _TEXT	
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 xor_func . . . . . . . . . . . .	P Near	 00000149 _TEXT	Length= 00000036 Public STDCALL
   enter_x  . . . . . . . . . . .	L Near	 00000149 _TEXT	
@@ -712,7 +722,7 @@ CAPSLOCK_ON  . . . . . . . . . .	Number	 00000080h
 CREATE_ALWAYS  . . . . . . . . .	Number	 00000002h   
 CREATE_NEW . . . . . . . . . . .	Number	 00000001h   
 CTRL_MASK  . . . . . . . . . . .	Number	 0000000Ch   
-CaseTable  . . . . . . . . . . .	DWord	 000004FB _DATA	
+CaseTable  . . . . . . . . . . .	DWord	 000000F0 _DATA	
 CreateFile . . . . . . . . . . .	Text   	 CreateFileA
 DO_NOT_SHARE . . . . . . . . . .	Number	 00000000h   
 ENABLE_ECHO_INPUT  . . . . . . .	Number	 00000004h   
@@ -914,14 +924,13 @@ WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 YN_MAX_BUF_LEN . . . . . . . . .	Number	 0000000Ah   
 YN_MAX_VALID_INPUT_LEN . . . . .	Number	 00000001h   
-answer . . . . . . . . . . . . .	Word	 00000523 _DATA	
+answer . . . . . . . . . . . . .	Word	 00000118 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
-enter_val  . . . . . . . . . . .	DWord	 00000525 _DATA	
+enter_val  . . . . . . . . . . .	DWord	 0000011A _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
-freqTable  . . . . . . . . . . .	DWord	 0000000B _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
@@ -931,18 +940,17 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-prompt_bye . . . . . . . . . . .	Byte	 000004F6 _DATA	
-prompt_choose  . . . . . . . . .	Byte	 0000044C _DATA	
-prompt_menu  . . . . . . . . . .	Byte	 0000040B _DATA	
-prompt_modechange  . . . . . . .	Byte	 00000467 _DATA	
-prompt_resultAND . . . . . . . .	Byte	 000004A5 _DATA	
-prompt_resultNOT . . . . . . . .	Byte	 000004CE _DATA	
-prompt_resultOR  . . . . . . . .	Byte	 000004BA _DATA	
-prompt_resultXOR . . . . . . . .	Byte	 000004E1 _DATA	
-prompt_x . . . . . . . . . . . .	Byte	 0000048F _DATA	
-prompt_y . . . . . . . . . . . .	Byte	 0000049A _DATA	
+prompt_bye . . . . . . . . . . .	Byte	 000000EB _DATA	
+prompt_choose  . . . . . . . . .	Byte	 00000041 _DATA	
+prompt_menu  . . . . . . . . . .	Byte	 00000000 _DATA	
+prompt_modechange  . . . . . . .	Byte	 0000005C _DATA	
+prompt_resultAND . . . . . . . .	Byte	 0000009A _DATA	
+prompt_resultNOT . . . . . . . .	Byte	 000000C3 _DATA	
+prompt_resultOR  . . . . . . . .	Byte	 000000AF _DATA	
+prompt_resultXOR . . . . . . . .	Byte	 000000D6 _DATA	
+prompt_x . . . . . . . . . . . .	Byte	 00000084 _DATA	
+prompt_y . . . . . . . . . . . .	Byte	 0000008F _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-target . . . . . . . . . . . . .	Byte	 00000000 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

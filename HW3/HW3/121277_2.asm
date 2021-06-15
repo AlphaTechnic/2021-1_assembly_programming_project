@@ -65,7 +65,7 @@ L1:
     cmp al, 0     ; EOF check
     je THEEND 
     
-    ; 4를 곱한다. 4byte 공간에 index에 해당하는 frequencies를 저장하기 위함 
+    ; multiply by 4, 4byte 공간에 frequencies를 저장하기 위함 
     shl eax, 2        
     ; 해당 index의 count를 1 올린다.
     inc DWORD PTR [edi + eax]
@@ -79,19 +79,19 @@ Get_frequencies ENDP
 
 ;-------------------------------------------------------------------------------
 display_table PROC
-;
 ; Display the non-empty entries of the frequency table.
 ;-------------------------------------------------------------------------------
     call Crlf
     mov ecx, length freqTable    
     mov esi, offset freqTable
-    mov ebx, 0 ; ASCII == 0 부터 탐색
+    mov ebx, 0          ; ASCII == 0 부터 탐색
 
  L1:    
     mov eax, [esi]
     cmp eax, 0
-    jz NXT               ; freq 0인 부분은 skip
+    jz NXT              ; freq 0인 부분은 skip
 
+print_table:
     mov eax, ebx    
     call Writehex
     mov edx, OFFSET space

@@ -17,6 +17,7 @@ include Irvine32.inc
 .code
 main proc
 retry:
+	mov eax, -1h
 	mov eax, 0
 	mov ebx, 0
 

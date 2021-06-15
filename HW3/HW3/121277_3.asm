@@ -13,9 +13,6 @@ TITLE Get frequencies
 INCLUDE Irvine32.inc
 
 .data
-    target byte "AAEBDCFBBC", 0 ; input data
-    freqTable DWORD 256 DUP(0)
-
     prompt_menu byte   "1. x AND y", 0dh, 0ah,
                    "2. x OR y", 0dh, 0ah,
                    "3. NOT x", 0dh, 0ah,
@@ -50,7 +47,7 @@ INCLUDE Irvine32.inc
     YN_MAX_VALID_INPUT_LEN = 1
     answer word 0
 
-    STRING_MAX_BUF_LEN = 10            ; input string buf
+    STRING_MAX_BUF_LEN = 10     ; input string buf
 	STRING_MAX_VALID_INPUT_LEN = 8
     enter_val dword 0
     
@@ -69,14 +66,14 @@ L1:
     call writestring
     
     call readdec
-    call validation
+    call validate_menu_choice
     jnz L1
 
-    push eax ; mode 저장
+    push eax                ; mode 저장
 
 exec_fun:
-    call choose_func ; returns selected item number in the al register
-    call check_answer;
+    call choose_func        ; returns selected func in the eax register
+    call validate_yn_choice;
     jc menu
 
 re_exec:
@@ -88,8 +85,10 @@ main ENDP
 
 
 ;-------------------------------------------------------------------------------
-validation proc
+validate_menu_choice proc
 ; Display the string input by data segment.
+; Recieves - nothing
+; Returns -  ZF (0 -> 정상적인 입력)
 ;-------------------------------------------------------------------------------
     cmp eax, 1
     jb THEEND
@@ -100,12 +99,14 @@ validation proc
     test ax, 0  ; ZF를 set하여 외부로 '정상적인 input'임을 알려줌
 THEEND:
     ret
-validation endp
+validate_menu_choice endp
 
 
 ;-------------------------------------------------------------------------------
 choose_func proc
-; Display the string input by data segment.
+; 사용자입력에 맞는 function을 Case table에서 search하여 eax 레지스터에 알려준다.
+; Recieves - CaseTable, NumberOfEntries
+; Returns -  eax (선택된 함수code block의 주소)
 ;-------------------------------------------------------------------------------
     mov esi, offset CaseTable
     mov ecx, NumberOfEntries
@@ -127,8 +128,10 @@ choose_func endp
 
 
 ;-------------------------------------------------------------------------------
-check_answer proc
-; Display the string input by data segment.
+validate_yn_choice proc
+; 사용자로부터 y or n를 입력 받고, 이에대한 유효성을 검사한다.
+; Recieves - nothing
+; Returns -  CF (1 -> yes, 0 -> no)
 ;-------------------------------------------------------------------------------
     call crlf
     call crlf
@@ -143,6 +146,7 @@ L1:
     cmp eax, YN_MAX_VALID_INPUT_LEN
     jne L1
 
+    ; 'Y', 'y', 'N', 'n'만 유효한 입력으로 detect
     cmp byte ptr [edx], 59h
     je END_y
     cmp byte ptr [edx], 79h
@@ -160,14 +164,14 @@ END_n:
     call crlf
     clc     ; set CF = 0 -> not change mode
     ret
-check_answer endp
-
-
+validate_yn_choice endp
 
 
 ;-------------------------------------------------------------------------------
 and_func proc
-; Display the string input by data segment.
+; 사용자로부터 2개의 hex value를 입력받고, AND 연산 수행
+; Recieves - nothing
+; Returns -  eax(연산 결과)
 ;-------------------------------------------------------------------------------
 enter_x:
     mov edx, offset prompt_x
@@ -196,9 +200,12 @@ THEEND:
 
 and_func endp
 
+
 ;-------------------------------------------------------------------------------
 or_func proc
-; Display the string input by data segment.
+; 사용자로부터 2개의 hex value를 입력받고, OR 연산 수행
+; Recieves - nothing
+; Returns -  eax(연산 결과)
 ;-------------------------------------------------------------------------------
  enter_x:
     mov edx, offset prompt_x
@@ -226,9 +233,12 @@ THEEND:
     ret
 or_func endp
 
+
 ;-------------------------------------------------------------------------------
 not_func proc
-; Display the string input by data segment.
+; 사용자로부터 1개의 hex value를 입력받고, NOT 연산 수행
+; Recieves - nothing
+; Returns -  eax(연산 결과)
 ;-------------------------------------------------------------------------------
  enter_x:
     mov edx, offset prompt_x
@@ -249,9 +259,12 @@ THEEND:
     ret
 not_func endp
 
+
 ;-------------------------------------------------------------------------------
 xor_func proc
-; Display the string input by data segment.
+; 사용자로부터 2개의 hex value를 입력받고, XOR 연산 수행
+; Recieves - nothing
+; Returns -  eax(연산 결과)
 ;-------------------------------------------------------------------------------
  enter_x:
     mov edx, offset prompt_x
@@ -280,10 +293,11 @@ THEEND:
 xor_func endp
 
 
-
 ;-------------------------------------------------------------------------------
 get_val proc uses ebx
-; Display the string input by data segment.
+; 사용자로부터 hex value를 입력받고, 이에 대한 유효성을 검사하는 함수
+; Recieves - nothing
+; Returns -  CF(0 -> 유효하지 않다, 1 -> 유효하다)
 ;-------------------------------------------------------------------------------
 B:
 	mov eax, 0
@@ -293,7 +307,7 @@ B:
 	mov ecx, STRING_MAX_BUF_LEN
 	call readstring
 	
-	cmp eax, STRING_MAX_VALID_INPUT_LEN  ;STRING_MAX_VALID_INPUT_LEN = 8
+	cmp eax, STRING_MAX_VALID_INPUT_LEN     ;STRING_MAX_VALID_INPUT_LEN = 8
 	ja FAIL
     cmp eax, 0
     je FAIL
@@ -335,7 +349,7 @@ zone1:                  ; ascii 30h ~ 39h ('0' ~ '9')
 	jmp SUCCESS
 
 zone2:                  ; ascii 41h ~ 46h ('A' ~ 'F')
-	shl ebx, 4
+	shl ebx, 4  
 
 	sub al, 37h
 	and al, 0Fh
@@ -375,7 +389,7 @@ get_val endp
 
 ;-------------------------------------------------------------------------------
 exit_func proc
-; Display the string input by data segment.
+; terminate the program
 ;-------------------------------------------------------------------------------
     exit
 exit_func endp
