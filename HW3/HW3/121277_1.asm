@@ -1,4 +1,4 @@
-TITLE Summing the gaps between Array Values
+TITLE Pair Sorting
 ;Make a program that sorts number pairs (X, Y). The program should sort all pairs based on X
 ;values and if two pairs¡¯ X values are same, then sort it based on Y values. For sorting, you
 ;should differentiate the order on odd index pairs and even index pairs. The odd index pairs should
@@ -7,9 +7,6 @@ TITLE Summing the gaps between Array Values
 ;in ascending order for Y values in case of same X values.
 ;Assume that pairs are given like (0x51, 0x13), (0x1, 0x1), (0x2, 0x3), (0x1, 0x5), (0x51, 0x21), 
 ;(0x2, 0x1), (0x1, 0x2).
-;
-;input :
-;hw3.inc
 ;
 
 INCLUDE irvine32.inc
